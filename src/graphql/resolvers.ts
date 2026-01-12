@@ -1,22 +1,40 @@
+import { Resolvers } from '@/generated/graphql-resolvers';
 import { prisma } from '@/lib/prisma';
 
-export const resolvers = {
+export const resolvers: Resolvers = {
   Query: {
-    me: async (_parent: any, _args: any, context: any) => {
-      const sessionUser = context.session?.user;
+    me: async (_parent, _args, context) => {
+      if (!context.session?.user?.username) return null;
 
-      if (!sessionUser?.username) return null;
-
-      const dbUser = await prisma.user.findUnique({
-        where: { username: sessionUser.username },
+      const user = await prisma.user.findUnique({
+        where: { username: context.session.user.username },
       });
 
-      if (!dbUser) return null;
+      if (!user) return null;
 
       return {
-        ...dbUser,
-        isAdmin: sessionUser.isAdmin,
+        ...user,
+        isAdmin: context.session.user.isAdmin,
       };
+    },
+    allPosts: async () => {
+      return await prisma.post.findMany({
+        include: {
+          author: true,
+          comments: true,
+          likes: true,
+        },
+      });
+    },
+    post: async (_parent, { id }) => {
+      return await prisma.post.findUnique({
+        where: { id },
+        include: {
+          author: true,
+          comments: true,
+          likes: true,
+        },
+      });
     },
   },
 };
