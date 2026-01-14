@@ -18,7 +18,7 @@ export const { docs, meta } = defineDocs({
     schema: frontmatterSchema.extend({
       id: z.string(),
       date: z.coerce.date(),
-      thumbnail: z.string().optional(),
+      thumbnail: z.string().nullish().or(z.literal('')),
       tags: z.array(z.string()),
     }),
   },

@@ -5,17 +5,28 @@ import { PrismaClient } from '@/generated/client';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-const adapter = new PrismaPg(pool);
+const createPrismaClient = () => {
+  const connectionString = process.env.DATABASE_URL;
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+  if (connectionString?.startsWith('prisma://')) {
+    return new PrismaClient({
+      accelerateUrl: connectionString,
+      log: ['query', 'error', 'warn'],
+    });
+  }
+
+  const pool = new pg.Pool({
+    connectionString,
+  });
+  const adapter = new PrismaPg(pool);
+
+  return new PrismaClient({
     adapter,
     log: ['query', 'error', 'warn'],
   });
+};
+
+export const prisma = globalForPrisma.prisma || createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
