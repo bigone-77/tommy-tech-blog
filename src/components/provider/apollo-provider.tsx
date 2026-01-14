@@ -8,10 +8,12 @@ import {
 } from '@apollo/client-integration-nextjs';
 
 function makeClient() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
-      uri: 'http://localhost:3000/api/graphql',
+      uri: `${baseUrl}/api/graphql`,
     }),
   });
 }
