@@ -34,8 +34,6 @@ next-env.d.ts
 
 .source/
 
-/src/generated/
-
 .source/
 .source-config.cache
 
