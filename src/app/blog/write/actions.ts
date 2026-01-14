@@ -5,8 +5,6 @@ import { redirect } from 'next/navigation';
 
 import { v2 as cloudinary } from 'cloudinary';
 import crypto from 'crypto';
-import fs from 'fs/promises';
-import path from 'path';
 
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -18,7 +16,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ✅ Cloudinary 서명 생성
 export async function getCloudinarySignature() {
   const timestamp = Math.round(new Date().getTime() / 1000);
   const signature = cloudinary.utils.api_sign_request(
@@ -44,7 +41,6 @@ export async function createPostAction(_: any, formData: FormData) {
 
   if (!validated.success) return { success: false, message: '입력값 오류' };
 
-  // ✅ 본문 첫 번째 이미지 추출 (Thumbnail)
   const imageMatch = content.match(/!\[.*?\]\((.*?)\)/);
   const thumbnail = imageMatch ? imageMatch[1] : '';
 
@@ -52,21 +48,6 @@ export async function createPostAction(_: any, formData: FormData) {
   const { title, tags } = validated.data;
 
   try {
-    const filePath = path.join(process.cwd(), 'blog/content', `${postId}.mdx`);
-    const mdxContent = `---
-id: ${postId}
-title: ${title}
-date: ${new Date().toISOString()}
-tags: ${JSON.stringify(tags)}
-thumbnail: ${thumbnail}
-author: ${session.user.name || 'Tommy'}
----
-
-${content}`;
-
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, mdxContent, 'utf-8');
-
     await prisma.post.create({
       data: {
         id: postId,
@@ -79,7 +60,7 @@ ${content}`;
       },
     });
   } catch (e) {
-    console.error(e);
+    console.error('DB 저장 실패:', e);
     return { success: false, message: '저장 실패' };
   }
 

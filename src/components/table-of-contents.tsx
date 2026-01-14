@@ -10,16 +10,18 @@ interface Heading {
   level: number;
 }
 
-interface TableOfContentsProps {
+export function TableOfContents({
+  content,
+  className,
+}: {
+  content: string;
   className?: string;
-}
-
-export function TableOfContents({ className }: TableOfContentsProps) {
+}) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>('');
 
   useEffect(() => {
-    const headingElements = document.querySelectorAll('h1, h2');
+    const headingElements = document.querySelectorAll('.prose h1, .prose h2');
     const headingsArray: Heading[] = [];
 
     headingElements.forEach((element) => {
@@ -33,127 +35,38 @@ export function TableOfContents({ className }: TableOfContentsProps) {
     });
 
     setHeadings(headingsArray);
-  }, []);
+  }, [content]);
 
   useEffect(() => {
+    if (headings.length === 0) return;
+
     const observer = new IntersectionObserver(
-      () => {
-        const headingPositions = headings.map((heading) => {
-          const element = document.getElementById(heading.id);
-          return {
-            id: heading.id,
-            top: element ? element.getBoundingClientRect().top : Infinity,
-          };
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
         });
-
-        let activeHeading = headingPositions.find(
-          (heading) => heading.top >= 0 && heading.top <= 100,
-        );
-
-        if (!activeHeading) {
-          const headingsAbove = headingPositions
-            .filter((heading) => heading.top < 0)
-            .sort((a, b) => b.top - a.top);
-
-          activeHeading = headingsAbove[0];
-        }
-
-        if (!activeHeading) {
-          const headingsBelow = headingPositions
-            .filter((heading) => heading.top > 100)
-            .sort((a, b) => a.top - b.top);
-
-          activeHeading = headingsBelow[0];
-        }
-
-        if (activeHeading && activeHeading.id !== activeId) {
-          setActiveId(activeHeading.id);
-        }
       },
-      {
-        root: null,
-        rootMargin: '-100px',
-        threshold: 0,
-      },
+      { rootMargin: '-80px 0% -80% 0%', threshold: 0 },
     );
 
     headings.forEach(({ id }) => {
       const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
+      if (element) observer.observe(element);
     });
 
-    const handleScroll = () => {
-      const headingPositions = headings.map((heading) => {
-        const element = document.getElementById(heading.id);
-        return {
-          id: heading.id,
-          top: element ? element.getBoundingClientRect().top : Infinity,
-        };
-      });
+    return () => observer.disconnect();
+  }, [headings]);
 
-      let activeHeading = headingPositions.find(
-        (heading) => heading.top >= -50 && heading.top <= 100,
-      );
-
-      if (!activeHeading) {
-        const headingsAbove = headingPositions
-          .filter((heading) => heading.top < -50)
-          .sort((a, b) => b.top - a.top);
-
-        activeHeading = headingsAbove[0];
-      }
-
-      if (activeHeading && activeHeading.id !== activeId) {
-        setActiveId(activeHeading.id);
-      }
-    };
-
-    let scrollTimeout: NodeJS.Timeout;
-    const throttledScroll = () => {
-      if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(handleScroll, 10);
-    };
-
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-
-    handleScroll();
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', throttledScroll);
-      if (scrollTimeout) clearTimeout(scrollTimeout);
-    };
-  }, [headings, activeId]);
-
-  const handleClick = async (id: string) => {
-    const url = `${window.location.origin}${window.location.pathname}#${id}`;
-
-    window.history.pushState({}, '', `#${id}`);
-
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch (err) {
-      console.error(err);
-      const textArea = document.createElement('textarea');
-      textArea.value = url;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-
+  const handleClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-
       window.scrollTo({
-        top: offsetPosition,
+        top: element.getBoundingClientRect().top + window.pageYOffset - 80,
         behavior: 'smooth',
       });
+      window.history.pushState({}, '', `#${id}`);
     }
   };
 
@@ -161,21 +74,20 @@ export function TableOfContents({ className }: TableOfContentsProps) {
 
   return (
     <div className={cn('space-y-2', className)}>
-      <h4 className='text-foreground mb-4 text-sm font-semibold'>
-        On this page
+      <h4 className='text-foreground mb-4 text-sm font-semibold tracking-wider uppercase'>
+        목차
       </h4>
       <nav>
-        <ul className='space-y-2'>
+        <ul className='space-y-2 border-l'>
           {headings.map((heading) => (
             <li key={heading.id}>
               <button
                 onClick={() => handleClick(heading.id)}
                 className={cn(
-                  'hover:text-foreground text-muted-foreground block w-full text-left text-sm transition-colors',
-                  {
-                    'text-primary font-medium underline underline-offset-4':
-                      activeId === heading.id,
-                  },
+                  'hover:text-foreground block border-l-2 border-transparent py-1 pl-4 text-left text-sm transition-colors',
+                  activeId === heading.id
+                    ? 'border-primary text-primary font-medium'
+                    : 'text-muted-foreground',
                 )}
               >
                 {heading.text}

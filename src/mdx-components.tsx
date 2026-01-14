@@ -19,10 +19,11 @@ import {
 const createHeading = (level: number) => {
   const Heading = ({
     children,
+    id,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
     return (
-      <CopyHeader level={level} {...props}>
+      <CopyHeader id={id} level={level} {...props}>
         {children}
       </CopyHeader>
     );
@@ -51,5 +52,3 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     ...components,
   };
 }
-
-export const useMDXComponents = getMDXComponents;

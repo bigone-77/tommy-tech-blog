@@ -1,16 +1,21 @@
+import { MDXRemote } from 'next-mdx-remote/rsc';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { DocsBody } from 'fumadocs-ui/page';
 import { ArrowLeft } from 'lucide-react';
+import rehypeSlug from 'rehype-slug';
+
+// ✅ 추가: DB 문자열 렌더링용
 
 import { AppLayout } from '@/components/app-layout';
 import { TableOfContents } from '@/components/table-of-contents';
 import { Button } from '@/components/ui/button';
 import { H1Typography } from '@/components/ui/typography';
-import { blogSource } from '@/lib/source';
+import { getBlogSource } from '@/lib/source';
+// ✅ 수정: 비동기 로더 함수
 import { getFormattedDate } from '@/lib/utils';
-import { PostInput as PostType } from '@/schema/write';
+import { getMDXComponents } from '@/mdx-components';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -18,14 +23,13 @@ interface Props {
 
 export default async function Page({ params }: Props) {
   const { id } = await params;
+
+  const blogSource = await getBlogSource();
   const page = blogSource.getPage([id]);
 
   if (!page) return notFound();
 
-  const post = page.data as unknown as PostType;
-
-  const date = new Date(page.data.date);
-  const MDX = page.data.body;
+  const { title, date, content, tags } = page.data;
 
   return (
     <AppLayout
@@ -34,7 +38,7 @@ export default async function Page({ params }: Props) {
           <p className='text-muted-foreground/80 mb-4 text-xs font-bold tracking-widest uppercase'>
             On This Page
           </p>
-          <TableOfContents />
+          <TableOfContents content={content} />
         </div>
       }
     >
@@ -46,9 +50,10 @@ export default async function Page({ params }: Props) {
               <span className='sr-only'>Back to all articles</span>
             </Link>
           </Button>
-          {page.data.tags && page.data.tags.length > 0 && (
+
+          {tags && tags.length > 0 && (
             <div className='text-muted-foreground flex flex-wrap gap-3'>
-              {page.data.tags.map((tag: string) => (
+              {tags.map((tag: string) => (
                 <span
                   key={tag}
                   className='bg-muted text-muted-foreground flex h-6 w-fit items-center justify-center rounded-md border px-3 text-sm font-medium'
@@ -58,25 +63,27 @@ export default async function Page({ params }: Props) {
               ))}
             </div>
           )}
+
           <time className='text-muted-foreground font-medium'>
-            {getFormattedDate(new Date(), 'M월 d일, yyyy년')}
+            {getFormattedDate(new Date(date), 'M월 d일, yyyy년')}
           </time>
         </div>
 
-        <H1Typography className='text-start'>{page.data.title}</H1Typography>
+        <H1Typography className='text-start'>{title}</H1Typography>
 
         <div className='prose dark:prose-invert prose-lg max-w-none'>
           <DocsBody>
-            <MDX />
+            <MDXRemote
+              source={content}
+              components={getMDXComponents()}
+              options={{
+                mdxOptions: {
+                  rehypePlugins: [rehypeSlug],
+                },
+              }}
+            />
           </DocsBody>
         </div>
-
-        {/* <div className="mt-10">
-            <ReadMoreSection
-              currentSlug={[slug]}
-              currentTags={page.data.tags}
-            />
-          </div> */}
       </div>
     </AppLayout>
   );
