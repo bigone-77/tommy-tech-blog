@@ -24,11 +24,37 @@ export const resolvers: Resolvers = {
           comments: true,
           likes: true,
         },
+        orderBy: { createdAt: 'desc' }, // 최신순 정렬 추가
       });
     },
     post: async (_parent, { id }) => {
       return await prisma.post.findUnique({
         where: { id },
+        include: {
+          author: true,
+          comments: true,
+          likes: true,
+        },
+      });
+    },
+  },
+
+  Mutation: {
+    createPost: async (_parent, { input }, context) => {
+      if (!context.session?.user?.id) {
+        throw new Error('인증되지 않은 사용자입니다.');
+      }
+
+      const { title, thumbnail, content, tags } = input;
+
+      return await prisma.post.create({
+        data: {
+          title,
+          thumbnail,
+          content,
+          tags: tags || [],
+          authorId: context.session.user.id,
+        },
         include: {
           author: true,
           comments: true,

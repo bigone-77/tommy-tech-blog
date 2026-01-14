@@ -16,11 +16,13 @@ export const typeDefs = gql`
   type Post {
     id: ID!
     title: String!
+    thumbnail: String
     content: String!
     published: Boolean!
     viewCount: Int!
     author: User!
     authorId: String!
+    tags: [String!]! # ✅ 태그 배열 추가 (비어있을 수 있으므로 빈 배열 보장)
     comments: [Comment!]!
     likes: [Like!]!
     createdAt: String!
@@ -43,7 +45,9 @@ export const typeDefs = gql`
 
   input CreatePostInput {
     title: String!
+    thumbnail: String
     content: String!
+    tags: [String!] # ✅ 생성 시 태그 입력값 허용
   }
 
   type Query {

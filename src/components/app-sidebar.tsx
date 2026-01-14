@@ -27,9 +27,7 @@ import {
   H4Typography,
   LargeTypography,
   MutedTypography,
-  PTypography,
 } from '@/components/ui/typography';
-import { cn } from '@/lib/utils';
 
 import { ThemeToggleButton } from './theme-toggle-button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -39,7 +37,7 @@ const SIDEBAR_PADDING = 'p-5';
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible='icon' {...props}>
-      <SidebarHeader className={SIDEBAR_PADDING}>
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <div className='flex items-center justify-between group-data-[collapsible=icon]:justify-center'>
@@ -50,7 +48,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Avatar>
                 <LargeTypography>Tommy Shin</LargeTypography>
               </div>
-              <ThemeToggleButton />
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -61,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* 2. Content: 소개 및 목차 */}
       <SidebarContent>
         {/* 소개글 섹션 */}
-        <SidebarGroup
+        {/* <SidebarGroup
           className={cn(
             'group-data-[collapsible=icon]:hidden',
             SIDEBAR_PADDING,
@@ -74,11 +71,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </PTypography>
         </SidebarGroup>
 
-        <SidebarSeparator />
+        <SidebarSeparator /> */}
 
         {/* 목차 섹션 */}
         <SidebarGroup>
-          <SidebarGroupContent className={SIDEBAR_PADDING}>
+          <SidebarGroupContent>
             <SidebarMenu>
               {[
                 { href: '/blog', label: '블로그', icon: BookOpen },
@@ -89,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton asChild tooltip={item.label}>
                     <Link href={item.href}>
-                      <item.icon className='size-6' />
+                      <item.icon />
                       <LargeTypography>{item.label}</LargeTypography>
                     </Link>
                   </SidebarMenuButton>
@@ -103,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarSeparator />
 
       {/* 3. Footer: 연결 및 저작권 */}
-      <SidebarFooter className={SIDEBAR_PADDING}>
+      <SidebarFooter>
         <SidebarGroup className='group-data-[collapsible=icon]:hidden'>
           <H4Typography>연결하기</H4Typography>
           <SidebarMenu>
@@ -126,8 +123,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
 
-        <div className='p-2 group-data-[collapsible=icon]:hidden'>
+        <div className='flex items-center justify-between p-2 group-data-[collapsible=icon]:hidden'>
           <MutedTypography>© 2026 Tommy Shin</MutedTypography>
+          <ThemeToggleButton />
         </div>
       </SidebarFooter>
     </Sidebar>

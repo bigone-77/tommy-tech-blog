@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import { v2 as cloudinary } from 'cloudinary';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
@@ -11,54 +12,75 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { postSchema } from '@/schema/write';
 
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ✅ Cloudinary 서명 생성
+export async function getCloudinarySignature() {
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp },
+    process.env.CLOUDINARY_API_SECRET!,
+  );
+  return { signature, timestamp };
+}
+
 export async function createPostAction(_: any, formData: FormData) {
   const session = await auth();
+  if (!session?.user?.isAdmin) return { success: false, message: '권한 없음' };
 
-  // 1. 관리자 권한 체크
-  if (!session?.user?.isAdmin) {
-    return { success: false, message: '관리자 권한이 없습니다.' };
-  }
+  const rawTags = formData.get('tags') as string;
+  const parsedTags = rawTags ? JSON.parse(rawTags) : [];
+  const content = formData.get('content') as string;
 
-  const rawData = Object.fromEntries(formData.entries());
-  const validated = postSchema.safeParse(rawData);
+  const validated = postSchema.safeParse({
+    title: formData.get('title'),
+    content: content,
+    tags: parsedTags,
+  });
 
-  if (!validated.success) {
-    return { success: false, message: '입력값이 올바르지 않습니다.' };
-  }
+  if (!validated.success) return { success: false, message: '입력값 오류' };
+
+  // ✅ 본문 첫 번째 이미지 추출 (Thumbnail)
+  const imageMatch = content.match(/!\[.*?\]\((.*?)\)/);
+  const thumbnail = imageMatch ? imageMatch[1] : '';
 
   const postId = crypto.randomUUID();
+  const { title, tags } = validated.data;
 
   try {
-    const contentDir = path.join(process.cwd(), 'blog/content');
-    const filePath = path.join(contentDir, `${postId}.mdx`);
-
+    const filePath = path.join(process.cwd(), 'blog/content', `${postId}.mdx`);
     const mdxContent = `---
 id: ${postId}
-title: ${validated.data.title}
+title: ${title}
 date: ${new Date().toISOString()}
+tags: ${JSON.stringify(tags)}
+thumbnail: ${thumbnail}
 author: ${session.user.name || 'Tommy'}
 ---
 
-${validated.data.content}`;
+${content}`;
 
-    await fs.mkdir(contentDir, { recursive: true });
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, mdxContent, 'utf-8');
 
     await prisma.post.create({
       data: {
         id: postId,
-        title: validated.data.title,
-        content: validated.data.content,
+        title,
+        content,
+        thumbnail,
+        tags,
         authorId: session.user.id!,
         published: true,
       },
     });
-  } catch (error) {
-    console.error('저장 중 오류 발생:', error);
-    return {
-      success: false,
-      message: '파일 또는 DB 저장 중 오류가 발생했습니다.',
-    };
+  } catch (e) {
+    console.error(e);
+    return { success: false, message: '저장 실패' };
   }
 
   revalidatePath('/blog');

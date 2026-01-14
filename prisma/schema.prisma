@@ -43,6 +43,8 @@ model Post {
   id        String    @id @default(dbgenerated("gen_random_uuid()"))
   title     String
   content   String
+  thumbnail String?
+  tags      String[]
   published Boolean   @default(false)
   viewCount Int       @default(0)
   author    User      @relation(fields: [authorId], references: [id])

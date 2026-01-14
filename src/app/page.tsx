@@ -14,10 +14,8 @@ import {
 } from '@/components/ui/typography';
 import { getClient } from '@/lib/apollo-client';
 
-// 쿼리 경로가 blog 폴더 안으로 이동했으므로 경로를 수정합니다.
 import { GET_POSTS } from './blog/page.queries';
 
-// TIL 및 프로젝트 맛보기 더미 데이터
 const RECENT_TILS = [
   {
     id: 1,
