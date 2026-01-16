@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "fumadocs-mdx && next dev --turbopack",
-    "build": "prisma generate && fumadocs-mdx && next build",
-    "build:vercel": "prisma generate && graphql-codegen --config codegen.ts && fumadocs-mdx && next build",
+    "dev": "next dev --turbopack",
+    "build": "prisma generate && next build",
+    "build:vercel": "prisma generate && graphql-codegen --config codegen.ts && next build",
     "start": "next start",
     "lint": "eslint",
     "codegen": "graphql-codegen --config codegen.ts",
@@ -55,6 +55,7 @@
     "react-hook-form": "7.71.0",
     "rehype-slug": "6.0.0",
     "tailwind-merge": "3.4.0",
+    "vaul": "1.1.2",
     "zod": "3.25.76"
   },
   "devDependencies": {

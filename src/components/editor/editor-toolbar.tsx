@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
+
 import {
   Bold,
   Code,
@@ -24,6 +26,7 @@ import {
 } from '@/components/ui/tooltip';
 import { EDITOR_SHORTCUTS, MarkdownAction } from '@/constants/editor-shortcuts';
 import { insertMarkdown } from '@/lib/editor-utils';
+import { cn } from '@/lib/utils';
 
 interface ToolbarProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -38,25 +41,34 @@ export function EditorToolbar({
   activeStyles,
   onImageClick,
 }: ToolbarProps) {
+  const [isSticky, setIsSticky] = useState(false);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSticky(entry.intersectionRatio < 1);
+      },
+      {
+        threshold: [1],
+        rootMargin: '-41px 0px 0px 0px',
+      },
+    );
+
+    if (toolbarRef.current) observer.observe(toolbarRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const handleAction = (type: MarkdownAction) => {
     if (type === 'image' && onImageClick) {
       onImageClick();
       return;
     }
-    if (textareaRef.current) {
+    if (textareaRef.current)
       insertMarkdown(textareaRef.current, type, onContentChange);
-    }
   };
 
-  const ToolbarButton = ({
-    action,
-    icon: Icon,
-    label,
-  }: {
-    action: MarkdownAction;
-    icon: any;
-    label: string;
-  }) => {
+  const ToolbarButton = ({ action, icon: Icon, label }: any) => {
     const info = Object.values(EDITOR_SHORTCUTS).find(
       (s) => s.action === action,
     );
@@ -77,11 +89,6 @@ export function EditorToolbar({
           className='flex flex-col items-center gap-0.5 px-2 py-1.5'
         >
           <span className='text-xs font-medium'>{info?.label || label}</span>
-          {info?.shortcut && (
-            <span className='text-muted-foreground text-[10px]'>
-              {info.shortcut}
-            </span>
-          )}
         </TooltipContent>
       </Tooltip>
     );
@@ -89,7 +96,16 @@ export function EditorToolbar({
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className='bg-background sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b pb-2'>
+      <div
+        ref={toolbarRef}
+        className={cn(
+          'bg-background sticky top-[-40px] z-30 transition-all duration-300 ease-in-out',
+          'mx-[-40px] !mt-0 mb-6 flex flex-wrap items-center gap-0.5 border-b px-[40px] pt-[40px] pb-3',
+          isSticky
+            ? 'border-b-primary/30 bg-background/95 py-4 shadow-lg backdrop-blur-sm'
+            : 'border-b-transparent shadow-none',
+        )}
+      >
         <ToolbarButton action='h1' icon={Heading1} label='제목 1' />
         <ToolbarButton action='h2' icon={Heading2} label='제목 2' />
         <ToolbarButton action='h3' icon={Heading3} label='제목 3' />

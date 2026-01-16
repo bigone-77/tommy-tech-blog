@@ -1,28 +1,21 @@
-import Link from 'next/link';
-
-import { CalendarIcon, PlusIcon, UserIcon } from 'lucide-react';
-
 import { AppLayout } from '@/components/app-layout';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
-import {
-  H1Typography,
-  H3Typography,
-  LeadTypography,
-  MutedTypography,
-  PTypography,
-} from '@/components/ui/typography';
+import { PostCard } from '@/components/post-card';
+import { TagFilter } from '@/components/tag-filter';
+import { FlickeringGrid } from '@/components/ui/flickering-grid';
+import { H1Typography, LeadTypography } from '@/components/ui/typography';
 import { getClient } from '@/lib/apollo-client';
+import { cn, getFormattedDate } from '@/lib/utils';
 
 import { GET_POSTS } from './page.queries';
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ tag?: string }>;
+}) {
+  const resolvedParams = await searchParams;
+  const selectedTag = resolvedParams.tag || 'All';
+
   const { data } = await getClient().query({
     query: GET_POSTS,
     context: { fetchOptions: { cache: 'no-store' } },
@@ -30,81 +23,77 @@ export default async function Page() {
 
   if (!data || !data.allPosts) return null;
 
+  const tagCounts: Record<string, number> = {
+    All: data.allPosts.length,
+  };
+
+  data.allPosts.forEach((post: any) => {
+    post.tags?.forEach((tag: string) => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    });
+  });
+
+  const allTags = [
+    'All',
+    ...Object.keys(tagCounts)
+      .filter((t) => t !== 'All')
+      .sort(),
+  ];
+
+  const filteredPosts =
+    selectedTag === 'All'
+      ? data.allPosts
+      : data.allPosts.filter((post: any) => post.tags?.includes(selectedTag));
+
   return (
-    <AppLayout
-    // aside={
-    //   <div className='border-border bg-card rounded-xl border p-6 shadow-sm'>
-    //     <p className='text-muted-foreground/80 mb-4 text-xs font-bold tracking-widest uppercase'>
-    //       Explore
-    //     </p>
-    //     <p className='text-muted-foreground text-sm'>
-    //       태그나 카테고리 필터링이 들어갈 자리입니다.
-    //     </p>
-    //   </div>
-    // }
-    >
-      <div className='space-y-12'>
-        <header className='flex items-end justify-between border-b pb-8'>
-          <div className='space-y-2'>
-            <H1Typography>신토미의 기술 블로그</H1Typography>
-            <LeadTypography>배움의 과정을 기록하고 공유합니다.</LeadTypography>
-          </div>
-          <Link href='/blog/write'>
-            <Button size='sm' className='gap-2'>
-              <PlusIcon className='h-4 w-4' />새 글 작성
-            </Button>
-          </Link>
-        </header>
+    <AppLayout>
+      <div className='absolute top-0 left-0 z-0 h-50 w-full [mask-image:linear-gradient(to_top,transparent_25%,black_95%)]'>
+        <FlickeringGrid
+          className='absolute top-0 left-0 size-full'
+          squareSize={4}
+          gridGap={6}
+          color='#6B7280'
+          maxOpacity={0.2}
+          flickerChance={0.05}
+        />
+      </div>
 
-        {/* 2. Grid Section: AppLayout 내부 @container/post를 기준으로 반응형 작동 */}
-        <section className='grid grid-cols-1 gap-6 @md/post:grid-cols-2'>
-          {data.allPosts.map((post: any) => (
-            <Link href={`/blog/${post.id}`} key={post.id} className='group'>
-              <Card className='hover:border-foreground/30 flex h-full flex-col transition-colors'>
-                <CardHeader className='space-y-3'>
-                  {/* 태그 표시 영역 추가 */}
-                  {post.tags && post.tags.length > 0 && (
-                    <div className='flex flex-wrap gap-1.5'>
-                      {post.tags.map((tag: string) => (
-                        <Badge
-                          key={tag}
-                          variant='secondary'
-                          className='text-[10px] tracking-wider uppercase'
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                  <H3Typography className='line-clamp-1 border-none pb-0'>
-                    {post.title}
-                  </H3Typography>
-                </CardHeader>
+      <header className='relative z-10 space-y-4 border-b pb-12'>
+        <div className='space-y-4'>
+          <H1Typography className='text-5xl font-black tracking-tighter'>
+            DIGITAL GARDEN
+          </H1Typography>
+          <LeadTypography className='text-muted-foreground/70'>
+            신토미의 기술 블로그: 배움과 기록의 아카이브.
+          </LeadTypography>
+        </div>
 
-                <CardContent className='flex-1'>
-                  <PTypography className='text-muted-foreground mt-0 line-clamp-3'>
-                    {post.content}
-                  </PTypography>
-                </CardContent>
+        <div className='pt-4'>
+          <TagFilter
+            tags={allTags}
+            selectedTag={selectedTag}
+            tagCounts={tagCounts}
+          />
+        </div>
+      </header>
 
-                <CardFooter className='flex gap-4 border-t pt-4'>
-                  <div className='flex items-center gap-1'>
-                    <UserIcon className='text-muted-foreground h-3.5 w-3.5' />
-                    <MutedTypography>
-                      {post.author.username || '익명'}
-                    </MutedTypography>
-                  </div>
-                  <div className='flex items-center gap-1'>
-                    <CalendarIcon className='text-muted-foreground h-3.5 w-3.5' />
-                    <MutedTypography>
-                      {new Date(parseInt(post.createdAt)).toLocaleDateString()}
-                    </MutedTypography>
-                  </div>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))}
-        </section>
+      <div
+        className={cn(
+          'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+          'gap-6 md:gap-8 lg:gap-12',
+          'mt-12',
+          filteredPosts.length < 4 ? 'border-b pb-12' : '',
+        )}
+      >
+        {filteredPosts.map((post: any) => (
+          <PostCard
+            key={post.id}
+            url={`/blog/${post.id}`}
+            title={post.title}
+            date={getFormattedDate(new Date(post.createdAt), 'M월 d일, yyyy년')}
+            thumbnail={post.thumbnail || ''}
+          />
+        ))}
       </div>
     </AppLayout>
   );

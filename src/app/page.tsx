@@ -1,42 +1,21 @@
 import Link from 'next/link';
 
-import { ArrowRightIcon, PlusIcon } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader } from '@/components/ui/card';
 import {
-  H1Typography,
-  H2Typography,
-  H3Typography,
-  MutedTypography,
-  PTypography,
-  SmallTypography,
-} from '@/components/ui/typography';
+  ArrowRightIcon,
+  BookText,
+  Code2,
+  GraduationCap,
+  PlusIcon,
+  Sparkles,
+} from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+// ✅ 설치 권장
+import { H2Typography } from '@/components/ui/typography';
 import { getClient } from '@/lib/apollo-client';
 
 import { GET_POSTS } from './blog/page.queries';
-
-const RECENT_TILS = [
-  {
-    id: 1,
-    date: '2026.01.12',
-    title: '컨테이너 쿼리로 반응형 레이아웃 정복하기',
-  },
-  { id: 2, date: '2026.01.10', title: 'Next.js 15의 새로운 서버 액션 패턴' },
-];
-
-const FEATURED_PROJECTS = [
-  {
-    id: 1,
-    title: '디지털 가든',
-    description: 'Tania Rascia 스타일의 개인 블로그 테마',
-  },
-  {
-    id: 2,
-    title: '알고리즘 자동화 도구',
-    description: '백준 문제를 블로그로 자동 포스팅하는 익스텐션',
-  },
-];
 
 export default async function HomePage() {
   const { data } = await getClient().query({
@@ -44,125 +23,183 @@ export default async function HomePage() {
     context: { fetchOptions: { cache: 'no-store' } },
   });
 
-  // 최근 블로그 글 상단 3개만 추출
   const recentPosts = data?.allPosts?.slice(0, 3) || [];
 
   return (
-    <div className='space-y-24'>
-      {/* 1. 인트로 섹션: Hey, I'm Tommy! */}
-      <section className='space-y-6'>
-        <H1Typography className='text-left'>
-          반가워요, 신토미입니다! 💾
-        </H1Typography>
-        <PTypography>
-          {`소프트웨어 엔지니어이자 오픈 소스 크리에이터입니다. 이곳은 제가 공부한
-          내용과 프로젝트를 기록하는 저만의 ${(<strong>디지털 정원</strong>)}입니다.`}
-        </PTypography>
-        <div className='flex gap-4'>
-          <Button asChild>
+    <div className='mx-auto max-w-4xl space-y-32 pb-20'>
+      <section className='relative space-y-8 pt-10'>
+        <div className='space-y-4'>
+          <Badge
+            variant='secondary'
+            className='bg-primary/10 text-primary border-none px-3 py-1 text-xs font-medium'
+          >
+            <Sparkles className='mr-2 h-3 w-3' /> Available for projects
+          </Badge>
+          <h1 className='text-left text-4xl leading-[1.1] font-black tracking-tight lg:text-6xl'>
+            반가워요, <br />
+            <span className='text-primary'>신토미</span>입니다! 💾
+          </h1>
+        </div>
+
+        <p className='text-muted-foreground max-w-2xl text-xl leading-relaxed'>
+          소프트웨어 엔지니어이자 오픈 소스 크리에이터입니다. 이곳은 제가 공부한
+          내용과 프로젝트를 기록하는 저만의{' '}
+          <span className='text-foreground decoration-primary/30 underline underline-offset-4'>
+            디지털 정원
+          </span>
+          입니다.
+        </p>
+
+        <div className='flex flex-wrap gap-4'>
+          <Button
+            size='lg'
+            asChild
+            className='shadow-primary/20 rounded-full px-8 shadow-lg transition-all hover:-translate-y-1'
+          >
             <Link href='/about-me'>소개 더보기</Link>
           </Button>
-          <Button variant='outline' asChild>
+          <Button
+            size='lg'
+            variant='outline'
+            asChild
+            className='hover:bg-accent rounded-full px-8 transition-all'
+          >
             <Link href='/blog/write' className='gap-2'>
-              <PlusIcon className='h-4 w-4' />새 글 작성
+              <PlusIcon className='h-4 w-4' /> 새 글 작성
             </Link>
           </Button>
         </div>
       </section>
 
-      <section className='space-y-6'>
-        <div className='flex items-end justify-between border-b pb-4'>
-          <H2Typography className='border-none pb-0'>
-            최근 블로그 포스트
-          </H2Typography>
+      {/* 2. Blog Posts: 리스트형이 아닌 카드형 강조 */}
+      <section className='space-y-10'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <BookText className='text-primary h-5 w-5' />
+            <H2Typography className='border-none pb-0 text-2xl font-bold'>
+              최근 블로그 포스트
+            </H2Typography>
+          </div>
           <Link
             href='/blog'
-            className='group flex items-center gap-1 text-sm font-medium hover:underline'
+            className='text-muted-foreground hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors'
           >
-            전체 읽기{' '}
-            <ArrowRightIcon className='h-3 w-3 transition-transform group-hover:translate-x-1' />
+            전체 읽기 <ArrowRightIcon className='h-4 w-4' />
           </Link>
         </div>
-        <div className='divide-border divide-y'>
+
+        <div className='grid gap-4'>
           {recentPosts.map((post: any) => (
-            <Link
-              key={post.id}
-              href={`/blog/${post.id}`}
-              className='group block py-4 first:pt-0'
-            >
-              <div className='flex items-center justify-between'>
-                <H3Typography className='group-hover:text-primary transition-colors'>
-                  {post.title}
-                </H3Typography>
-                <MutedTypography>
-                  {new Date(parseInt(post.createdAt)).toLocaleDateString()}
-                </MutedTypography>
+            <Link key={post.id} href={`/blog/${post.id}`} className='group'>
+              <div className='bg-card hover:border-primary/20 relative overflow-hidden rounded-2xl border p-6 transition-all hover:shadow-md'>
+                <div className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
+                  <div className='space-y-1'>
+                    <h3 className='group-hover:text-primary text-lg font-bold transition-colors'>
+                      {post.title}
+                    </h3>
+                    <div className='flex gap-2'>
+                      {post.tags?.slice(0, 2).map((tag: string) => (
+                        <span
+                          key={tag}
+                          className='text-muted-foreground text-[10px] tracking-wider uppercase'
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <time className='text-muted-foreground shrink-0 font-mono text-sm'>
+                    {new Date(parseInt(post.createdAt)).toLocaleDateString(
+                      'ko-KR',
+                      {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                      },
+                    )}
+                  </time>
+                </div>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* 3. TIL 섹션: 간결한 리스트 */}
-      <section className='space-y-6'>
-        <div className='flex items-end justify-between border-b pb-4'>
-          <H2Typography className='border-none pb-0'>
-            오늘 배운 것 (TIL)
-          </H2Typography>
-          <Link
-            href='/til'
-            className='group flex items-center gap-1 text-sm font-medium hover:underline'
-          >
-            모든 기록 보기{' '}
-            <ArrowRightIcon className='h-3 w-3 transition-transform group-hover:translate-x-1' />
-          </Link>
-        </div>
-        <div className='space-y-4'>
-          {RECENT_TILS.map((til) => (
+      {/* 3. TIL & Projects: 2열 그리드 배치로 정보 밀도 최적화 */}
+      <div className='grid grid-cols-1 gap-16 md:grid-cols-2'>
+        {/* TIL 섹션 */}
+        <section className='space-y-8'>
+          <div className='flex items-center justify-between border-b pb-4'>
+            <div className='flex items-center gap-2'>
+              <GraduationCap className='text-primary h-5 w-5' />
+              <H2Typography className='border-none pb-0 text-xl font-bold'>
+                TIL
+              </H2Typography>
+            </div>
             <Link
-              key={til.id}
-              href={`/til/${til.id}`}
-              className='group flex items-center gap-4'
+              href='/til'
+              className='text-muted-foreground text-xs font-medium hover:underline'
             >
-              <SmallTypography className='text-primary font-mono'>
-                {til.date}
-              </SmallTypography>
-              <span className='font-medium group-hover:underline'>
-                {til.title}
-              </span>
+              전체보기
             </Link>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className='space-y-6'>
+            {[
+              { id: 1, date: '01.12', title: '컨테이너 쿼리 정복' },
+              { id: 2, date: '01.10', title: 'Next.js 15 서버 액션' },
+            ].map((til) => (
+              <Link
+                key={til.id}
+                href={`/til/${til.id}`}
+                className='group flex items-start gap-4'
+              >
+                <span className='text-primary bg-primary/5 mt-1 rounded-md px-2 py-1 text-[10px] font-black'>
+                  {til.date}
+                </span>
+                <span className='group-hover:text-primary text-sm leading-snug font-medium transition-colors'>
+                  {til.title}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-      {/* 4. 프로젝트 섹션: 카드 그리드 (@md 컨테이너 쿼리 활용) */}
-      <section className='space-y-6'>
-        <div className='flex items-end justify-between border-b pb-4'>
-          <H2Typography className='border-none pb-0'>프로젝트</H2Typography>
-          <Link
-            href='/projects'
-            className='group flex items-center gap-1 text-sm font-medium hover:underline'
-          >
-            전체 프로젝트{' '}
-            <ArrowRightIcon className='h-3 w-3 transition-transform group-hover:translate-x-1' />
-          </Link>
-        </div>
-        <div className='grid grid-cols-1 gap-4 @md:grid-cols-2'>
-          {FEATURED_PROJECTS.map((project) => (
-            <Card
-              key={project.id}
-              className='hover:bg-accent/50 transition-colors'
+        {/* 프로젝트 섹션 */}
+        <section className='space-y-8'>
+          <div className='flex items-center justify-between border-b pb-4'>
+            <div className='flex items-center gap-2'>
+              <Code2 className='text-primary h-5 w-5' />
+              <H2Typography className='border-none pb-0 text-xl font-bold'>
+                Projects
+              </H2Typography>
+            </div>
+            <Link
+              href='/projects'
+              className='text-muted-foreground text-xs font-medium hover:underline'
             >
-              <CardHeader className='p-6'>
-                <H3Typography className='mt-0'>{project.title}</H3Typography>
-                <MutedTypography className='mt-2'>
-                  {project.description}
-                </MutedTypography>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </section>
+              전체보기
+            </Link>
+          </div>
+          <div className='grid gap-4'>
+            {[
+              { id: 1, title: '디지털 가든', desc: '개인 블로그 테마' },
+              { id: 2, title: '알고리즘 도구', desc: '자동 포스팅 익스텐션' },
+            ].map((project) => (
+              <div
+                key={project.id}
+                className='group hover:bg-accent/50 cursor-pointer rounded-xl border p-4 transition-all'
+              >
+                <h4 className='group-hover:text-primary text-sm font-bold'>
+                  {project.title}
+                </h4>
+                <p className='text-muted-foreground mt-1 text-xs'>
+                  {project.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

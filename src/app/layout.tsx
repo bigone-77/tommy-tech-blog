@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import { AppSidebar } from '@/components/app-sidebar';
 import { ApolloProvider } from '@/components/provider/apollo-provider';
 import { ThemeProvider } from '@/components/provider/theme-provider';
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
@@ -41,17 +42,22 @@ export default function RootLayout({
           >
             <SidebarProvider>
               <AppSidebar />
-              <SidebarTrigger />
               <SidebarInset>
-                <header className='bg-background/50 sticky top-0 z-30 flex h-14 items-center gap-4 border-b px-6 backdrop-blur-md md:hidden'>
-                  <div className='bg-border h-4 w-[1px]' />
-                  <span className='text-sm font-bold tracking-tight'>
-                    Tommy Shin
-                  </span>
+                <header className='bg-background/80 sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur-md transition-all duration-200'>
+                  <SidebarTrigger className='hover:bg-accent -ml-1 transition-colors duration-200' />
+
+                  <Separator className='!h-6' orientation='vertical' />
+
+                  <div className='flex items-center gap-2'>
+                    <span className='truncate text-sm font-semibold tracking-tight'>
+                      Tommy Shin
+                    </span>
+                    {/* 필요하다면 여기에 현재 페이지 이름을 추가할 수 있습니다. */}
+                  </div>
                 </header>
 
-                <div className='relative flex min-h-screen flex-col'>
-                  <main className='@container/main relative flex-1'>
+                <div className='relative flex flex-1 flex-col'>
+                  <main className='@container/main relative flex-1 p-6 lg:p-10'>
                     {children}
                   </main>
                 </div>

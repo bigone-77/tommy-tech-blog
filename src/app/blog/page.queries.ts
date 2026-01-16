@@ -6,6 +6,8 @@ export const GET_POSTS = graphql(`
       id
       title
       content
+      thumbnail
+      tags
       createdAt
       author {
         username

@@ -67,7 +67,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
         onChange={(e) => setPendingTag(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={
-          value.length === 0 ? '태그를 입력하고 엔터를 누르세요...' : ''
+          pendingTag.length === 0 ? '태그를 입력하고 엔터를 누르세요...' : ''
         }
         className='h-7 flex-1 border-0 p-0 shadow-none focus-visible:ring-0'
       />

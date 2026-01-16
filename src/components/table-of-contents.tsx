@@ -1,41 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
-interface Heading {
+export interface Heading {
   id: string;
   text: string;
   level: number;
 }
 
-export function TableOfContents({
-  content,
-  className,
-}: {
-  content: string;
+interface TableOfContentsProps {
+  headings: Heading[];
   className?: string;
-}) {
-  const [headings, setHeadings] = useState<Heading[]>([]);
+}
+
+export function TableOfContents({ headings, className }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
 
-  useEffect(() => {
-    const headingElements = document.querySelectorAll('.prose h1, .prose h2');
-    const headingsArray: Heading[] = [];
-
-    headingElements.forEach((element) => {
-      if (element.id) {
-        headingsArray.push({
-          id: element.id,
-          text: element.textContent || '',
-          level: parseInt(element.tagName.charAt(1)),
-        });
-      }
-    });
-
-    setHeadings(headingsArray);
-  }, [content]);
+  const visibleHeadings = useRef<Map<string, boolean>>(new Map());
 
   useEffect(() => {
     if (headings.length === 0) return;
@@ -43,12 +26,21 @@ export function TableOfContents({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
+          visibleHeadings.current.set(entry.target.id, entry.isIntersecting);
         });
+
+        const firstVisibleHeading = headings.find((h) =>
+          visibleHeadings.current.get(h.id),
+        );
+
+        if (firstVisibleHeading) {
+          setActiveId(firstVisibleHeading.id);
+        }
       },
-      { rootMargin: '-80px 0% -80% 0%', threshold: 0 },
+      {
+        rootMargin: '-85px 0% -80% 0%',
+        threshold: 0,
+      },
     );
 
     headings.forEach(({ id }) => {
@@ -62,10 +54,17 @@ export function TableOfContents({
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
       window.scrollTo({
-        top: element.getBoundingClientRect().top + window.pageYOffset - 80,
+        top: offsetPosition,
         behavior: 'smooth',
       });
+
       window.history.pushState({}, '', `#${id}`);
     }
   };
@@ -73,29 +72,28 @@ export function TableOfContents({
   if (headings.length === 0) return null;
 
   return (
-    <div className={cn('space-y-2', className)}>
-      <h4 className='text-foreground mb-4 text-sm font-semibold tracking-wider uppercase'>
-        목차
-      </h4>
-      <nav>
-        <ul className='space-y-2 border-l'>
-          {headings.map((heading) => (
-            <li key={heading.id}>
-              <button
-                onClick={() => handleClick(heading.id)}
-                className={cn(
-                  'hover:text-foreground block border-l-2 border-transparent py-1 pl-4 text-left text-sm transition-colors',
-                  activeId === heading.id
-                    ? 'border-primary text-primary font-medium'
-                    : 'text-muted-foreground',
-                )}
-              >
-                {heading.text}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+    <nav className={cn('text-sm', className)}>
+      <ul className='border-border/30 space-y-0.5 border-l'>
+        {headings.map((heading) => (
+          <li key={heading.id}>
+            <button
+              onClick={() => handleClick(heading.id)}
+              style={{
+                paddingLeft: `${(heading.level - 1) * 0.75 + 1}rem`,
+              }}
+              className={cn(
+                'hover:text-foreground block w-full border-l-2 border-transparent py-1 text-left transition-all duration-200',
+                'text-[13px] leading-tight wrap-break-word whitespace-normal',
+                activeId === heading.id
+                  ? 'border-primary text-primary bg-primary/5 font-medium'
+                  : 'text-muted-foreground/60 hover:border-border/60',
+              )}
+            >
+              {heading.text}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }

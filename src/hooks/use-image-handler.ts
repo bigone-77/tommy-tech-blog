@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { UseFormSetValue } from 'react-hook-form';
 
-import { getCloudinarySignature } from '@/app/blog/write/actions';
+import { getCloudinarySignature } from '@/app/blog/write/page.actions';
 import { PostInput } from '@/schema/write';
 
 interface UseImageHandlerProps {
