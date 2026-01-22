@@ -52,7 +52,6 @@ export default function RootLayout({
                     <span className='truncate text-sm font-semibold tracking-tight'>
                       Tommy Shin
                     </span>
-                    {/* 필요하다면 여기에 현재 페이지 이름을 추가할 수 있습니다. */}
                   </div>
                 </header>
 

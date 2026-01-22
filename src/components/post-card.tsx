@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Post } from '@prisma/client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 import { AppImage } from './app-image';
 
@@ -25,14 +26,20 @@ export function PostCard({ url, title, date, thumbnail }: Props) {
           />
         </div>
 
-        <CardHeader>
-          <CardTitle className='group-hover:text-primary text-xl leading-tight font-bold tracking-tight transition-colors'>
+        <CardHeader className='flex-1'>
+          <CardTitle
+            className={cn(
+              'group-hover:text-primary text-lg leading-snug font-bold tracking-tight transition-colors',
+              'line-clamp-2',
+            )}
+          >
             {title}
           </CardTitle>
         </CardHeader>
 
-        <CardContent>
-          <time className='text-muted-foreground/60 block font-mono text-xs font-medium tracking-widest uppercase'>
+        {/* 3. 푸터 영역: mt-auto로 항상 카드 바닥에 밀착 */}
+        <CardContent className='px-5 pt-0 pb-5'>
+          <time className='text-muted-foreground block font-mono text-[10px] font-medium tracking-widest uppercase'>
             {date}
           </time>
         </CardContent>

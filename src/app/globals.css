@@ -48,11 +48,11 @@
   --radius-4xl: calc(var(--radius) + 16px);
   --animate-grid: grid 15s linear infinite;
   @keyframes grid {
-  0% {
-    transform: translateY(-50%);
+    0% {
+      transform: translateY(-50%);
     }
-  100% {
-    transform: translateY(0);
+    100% {
+      transform: translateY(0);
     }
   }
 }
@@ -133,4 +133,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

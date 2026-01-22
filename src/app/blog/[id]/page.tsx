@@ -8,6 +8,7 @@ import rehypeSlug from 'rehype-slug';
 
 import { AppLayout } from '@/components/app-layout';
 import { ReadMoreSection } from '@/components/read-more-section';
+import { ReadProgressBar } from '@/components/read-progressbar';
 import { TableOfContents } from '@/components/table-of-contents';
 import { Button } from '@/components/ui/button';
 import { H1Typography } from '@/components/ui/typography';
@@ -48,6 +49,7 @@ export default async function Page({ params }: Props) {
         ) : null
       }
     >
+      <ReadProgressBar />
       <div className='space-y-6'>
         <div className='flex items-center justify-between'>
           <div className='text-muted-foreground flex flex-wrap items-center gap-3 gap-y-5 text-sm'>

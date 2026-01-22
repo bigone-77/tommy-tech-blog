@@ -1,12 +1,16 @@
+import { Suspense } from 'react';
+
+import { BookText } from 'lucide-react';
+
 import { AppLayout } from '@/components/app-layout';
-import { PostCard } from '@/components/post-card';
-import { TagFilter } from '@/components/tag-filter';
 import { FlickeringGrid } from '@/components/ui/flickering-grid';
 import { H1Typography, LeadTypography } from '@/components/ui/typography';
-import { getClient } from '@/lib/apollo-client';
-import { cn, getFormattedDate } from '@/lib/utils';
 
-import { GET_POSTS } from './page.queries';
+import { BlogContent } from './_components/blog-content';
+import {
+  PostGridSkeleton,
+  TagFilterSkeleton,
+} from './_components/blog-skeletons';
 
 export default async function Page({
   searchParams,
@@ -15,35 +19,6 @@ export default async function Page({
 }) {
   const resolvedParams = await searchParams;
   const selectedTag = resolvedParams.tag || 'All';
-
-  const { data } = await getClient().query({
-    query: GET_POSTS,
-    context: { fetchOptions: { cache: 'no-store' } },
-  });
-
-  if (!data || !data.allPosts) return null;
-
-  const tagCounts: Record<string, number> = {
-    All: data.allPosts.length,
-  };
-
-  data.allPosts.forEach((post: any) => {
-    post.tags?.forEach((tag: string) => {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-    });
-  });
-
-  const allTags = [
-    'All',
-    ...Object.keys(tagCounts)
-      .filter((t) => t !== 'All')
-      .sort(),
-  ];
-
-  const filteredPosts =
-    selectedTag === 'All'
-      ? data.allPosts
-      : data.allPosts.filter((post: any) => post.tags?.includes(selectedTag));
 
   return (
     <AppLayout>
@@ -60,41 +35,33 @@ export default async function Page({
 
       <header className='relative z-10 space-y-4 border-b pb-12'>
         <div className='space-y-4'>
-          <H1Typography className='text-5xl font-black tracking-tighter'>
-            DIGITAL GARDEN
-          </H1Typography>
+          <div className='flex items-center gap-x-2'>
+            <BookText
+              size={48}
+              strokeWidth={2.5}
+              className='text-primary shrink-0'
+            />
+            <H1Typography className='text-start text-5xl font-black tracking-tighter'>
+              블로그 기록
+            </H1Typography>
+          </div>
           <LeadTypography className='text-muted-foreground/70'>
-            신토미의 기술 블로그: 배움과 기록의 아카이브.
+            단순한 지식 습득을 넘어, 최적의 구조와 치밀한 구현을 위해 집요하게
+            고민한 흔적들입니다.
           </LeadTypography>
         </div>
 
-        <div className='pt-4'>
-          <TagFilter
-            tags={allTags}
-            selectedTag={selectedTag}
-            tagCounts={tagCounts}
-          />
-        </div>
+        <Suspense
+          fallback={
+            <>
+              <TagFilterSkeleton />
+              <PostGridSkeleton />
+            </>
+          }
+        >
+          <BlogContent selectedTag={selectedTag} />
+        </Suspense>
       </header>
-
-      <div
-        className={cn(
-          'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-          'gap-6 md:gap-8 lg:gap-12',
-          'mt-12',
-          filteredPosts.length < 4 ? 'border-b pb-12' : '',
-        )}
-      >
-        {filteredPosts.map((post: any) => (
-          <PostCard
-            key={post.id}
-            url={`/blog/${post.id}`}
-            title={post.title}
-            date={getFormattedDate(new Date(post.createdAt), 'M월 d일, yyyy년')}
-            thumbnail={post.thumbnail || ''}
-          />
-        ))}
-      </div>
     </AppLayout>
   );
 }
