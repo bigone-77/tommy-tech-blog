@@ -58,9 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <AvatarFallback className='rounded-lg'>TM</AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
-                  <span className='truncate font-semibold italic'>
-                    Tommy Shin
-                  </span>
+                  <span className='truncate font-semibold'>Tommy Shin</span>
                   <span className='text-muted-foreground truncate text-[10px]'>
                     Front-end Developer
                   </span>

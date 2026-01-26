@@ -1,10 +1,14 @@
 import { Suspense } from 'react';
 
-import { BookText } from 'lucide-react';
+import Link from 'next/link';
+
+import { BookText, PlusIcon } from 'lucide-react';
 
 import { AppLayout } from '@/components/app-layout';
+import { Button } from '@/components/ui/button';
 import { FlickeringGrid } from '@/components/ui/flickering-grid';
 import { H1Typography, LeadTypography } from '@/components/ui/typography';
+import { auth } from '@/lib/auth';
 
 import { BlogContent } from './_components/blog-content';
 import {
@@ -17,6 +21,9 @@ export default async function Page({
 }: {
   searchParams: Promise<{ tag?: string }>;
 }) {
+  const session = await auth();
+  const isAdmin = session?.user?.isAdmin;
+
   const resolvedParams = await searchParams;
   const selectedTag = resolvedParams.tag || 'All';
 
@@ -35,16 +42,31 @@ export default async function Page({
 
       <header className='relative z-10 space-y-4 border-b pb-12'>
         <div className='space-y-4'>
-          <div className='flex items-center gap-x-2'>
-            <BookText
-              size={48}
-              strokeWidth={2.5}
-              className='text-primary shrink-0'
-            />
-            <H1Typography className='text-start text-5xl font-black tracking-tighter'>
-              블로그 기록
-            </H1Typography>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-x-2'>
+              <BookText
+                size={48}
+                strokeWidth={2.5}
+                className='text-primary shrink-0'
+              />
+              <H1Typography className='text-start text-5xl font-black tracking-tighter'>
+                블로그
+              </H1Typography>
+            </div>
+            {isAdmin && (
+              <Button
+                size='lg'
+                variant='outline'
+                asChild
+                className='hover:bg-accent rounded-full px-8 transition-all'
+              >
+                <Link href='/blog/write' className='gap-2'>
+                  <PlusIcon className='h-4 w-4' /> 새 글 작성
+                </Link>
+              </Button>
+            )}
           </div>
+
           <LeadTypography className='text-muted-foreground/70'>
             단순한 지식 습득을 넘어, 최적의 구조와 치밀한 구현을 위해 집요하게
             고민한 흔적들입니다.

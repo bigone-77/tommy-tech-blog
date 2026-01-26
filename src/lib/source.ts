@@ -9,6 +9,8 @@ interface MyBlogConfig {
     content: string;
     tags: string[];
     thumbnail?: string | null;
+    viewCount: number;
+    readingTime: number;
   };
   metaData: Record<string, unknown>;
 }
@@ -21,14 +23,16 @@ export async function getBlogSource() {
 
   const mySource: Source<MyBlogConfig> = {
     files: posts.map((post) => ({
-      type: 'page', // 가상 파일의 타입을 '페이지'로 지정
-      path: `${post.id}.mdx`, // 가상의 경로 설정 (Fumadocs 내부 인덱싱용)
+      type: 'page',
+      path: `${post.id}.mdx`,
       data: {
         title: post.title,
         date: post.createdAt,
-        content: post.content, // DB에 저장된 MDX 문자열 (Frontmatter 포함)
+        content: post.content,
         tags: post.tags,
         thumbnail: post.thumbnail,
+        viewCount: post.viewCount,
+        readingTime: post.readingTime,
       },
     })),
   };

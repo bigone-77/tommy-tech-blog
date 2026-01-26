@@ -51,22 +51,28 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
     return () => observer.disconnect();
   }, [headings]);
 
+  // TableOfContents.tsx 내부 handleClick 함수
+
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-
-      window.history.pushState({}, '', `#${id}`);
+    if (!element) {
+      console.warn(`ID를 찾을 수 없습니다: ${id}`); // 🚀 디버깅용 로그
+      return;
     }
+
+    // 🚀 window.pageYOffset을 사용하는 것이 더 정확합니다.
+    const offset = 100; // 헤더 높이에 맞춰 조정하세요.
+    const elementPosition =
+      element.getBoundingClientRect().top + window.pageYOffset;
+    const offsetPosition = elementPosition - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth',
+    });
+
+    window.history.pushState({}, '', `#${id}`);
   };
 
   if (headings.length === 0) return null;

@@ -3,14 +3,12 @@ import { gql } from 'graphql-tag';
 export const typeDefs = gql`
   type User {
     id: ID!
-    username: String! # Prisma의 ?에도 불구하고 UI 보장을 위해 ! 추가
+    username: String!
     name: String
     email: String
     image: String
     isAdmin: Boolean
     posts: [Post!]!
-    createdAt: String!
-    updatedAt: String!
   }
 
   type Post {
@@ -20,20 +18,12 @@ export const typeDefs = gql`
     content: String!
     published: Boolean!
     viewCount: Int!
+    readingTime: Int!
     author: User!
     authorId: String!
-    tags: [String!]! # ✅ 태그 배열 추가 (비어있을 수 있으므로 빈 배열 보장)
-    comments: [Comment!]!
+    tags: [String!]!
     likes: [Like!]!
     createdAt: String!
-  }
-
-  type Comment {
-    id: ID!
-    content: String!
-    createdAt: String!
-    post: Post!
-    postId: String!
   }
 
   type Like {
@@ -47,13 +37,13 @@ export const typeDefs = gql`
     title: String!
     thumbnail: String
     content: String!
-    tags: [String!] # ✅ 생성 시 태그 입력값 허용
+    tags: [String!]
   }
 
   type Query {
-    me: User # 로그인 안 했을 수 있으므로 Optional 유지
+    me: User
     allPosts: [Post!]!
-    post(id: ID!): Post # 게시글이 없을 수 있으므로 Optional 유지
+    post(id: ID!): Post
   }
 
   type Mutation {

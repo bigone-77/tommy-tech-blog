@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { headers } from 'next/headers';
 
+import { AppBreadCrumb } from '@/components/app-breadcrumb';
 import { AppSidebar } from '@/components/app-sidebar';
+import { SiteTracker } from '@/components/app-site-tracker';
 import { ApolloProvider } from '@/components/provider/apollo-provider';
 import { ThemeProvider } from '@/components/provider/theme-provider';
-import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
@@ -25,11 +27,14 @@ export const metadata: Metadata = {
   description: '프론트엔드 개발 로그',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const ip = headerList.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
+
   return (
     <html lang='ko' suppressHydrationWarning>
       <body className={pretendard.className}>
@@ -41,18 +46,12 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SidebarProvider>
+              <SiteTracker ip={ip} />
               <AppSidebar />
               <SidebarInset>
                 <header className='bg-background/80 sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur-md transition-all duration-200'>
                   <SidebarTrigger className='hover:bg-accent -ml-1 transition-colors duration-200' />
-
-                  <Separator className='!h-6' orientation='vertical' />
-
-                  <div className='flex items-center gap-2'>
-                    <span className='truncate text-sm font-semibold tracking-tight'>
-                      Tommy Shin
-                    </span>
-                  </div>
+                  <AppBreadCrumb />
                 </header>
 
                 <div className='relative flex flex-1 flex-col'>

@@ -140,3 +140,57 @@
   animation: none;
   mix-blend-mode: normal;
 }
+
+[data-rehype-pretty-code-figure] span {
+  color: var(--shiki-light);
+}
+
+.dark [data-rehype-pretty-code-figure] span {
+  color: var(--shiki-dark);
+}
+
+[data-rehype-pretty-code-figure] pre {
+  background-color: var(--shiki-light-bg) !important;
+}
+
+.dark [data-rehype-pretty-code-figure] pre {
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+[data-rehype-pretty-code-figure] pre {
+  @apply border-border overflow-x-auto rounded-xl;
+  padding-left: 0 !important; /* 내부 line 패딩으로 조절 위해 0 설정 */
+}
+
+[data-rehype-pretty-code-figure] code {
+  counter-reset: line; /* 속성 유무 상관없이 카운터 시작 */
+  display: grid !important;
+  min-width: 100%;
+}
+
+/* 3. 줄 번호 표시 (data-line이 있는 모든 요소 대상) */
+[data-line] {
+  @apply relative px-4;
+}
+
+[data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+
+  /* 숫자 디자인 및 고정 폭 확보 */
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1.5rem;
+  text-align: right;
+  color: var(--color-muted-foreground);
+  opacity: 0.3;
+  user-select: none; /* 드래그 시 번호 제외 */
+}
+
+[data-line].highlighted {
+  @apply bg-accent/50 border-l-primary border-l-2;
+}
+
+[data-rehype-pretty-code-figure] {
+  @apply relative;
+}

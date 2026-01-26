@@ -1,23 +1,32 @@
 export function extractHeadings(content: string) {
-  // 1. 코드 블록 내부의 내용을 제거하여 오탐 방지
-  const cleanContent = content.replace(/```[\s\S]*?```/g, '');
-
-  // 2. 제목(#, ##, ###) 추출
-  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
+  const headingRegex = /^(#{1,6})\s+(.+)$/gm;
   const headings = [];
+  const slugCounts: Record<string, number> = {};
+
   let match;
 
-  while ((match = headingRegex.exec(cleanContent)) !== null) {
+  while ((match = headingRegex.exec(content)) !== null) {
     const level = match[1].length;
     const text = match[2].trim();
-    // fumadocs나 rehype-slug가 생성하는 id 규칙에 맞춰 slug 생성 (또는 content 기반)
-    const id = text
+
+    let baseSlug = text
       .toLowerCase()
+      .trim()
+      .replace(/[\u2000-\u3300]|[\ud83c\ud83d\ud83e][\ud000-\udfff]/g, '')
+      .replace(/[^\w\s\uAC00-\uD7A3-]/g, '')
       .replace(/\s+/g, '-')
-      .replace(/[^\wㄱ-ㅎㅏ-ㅣ가-힣-]/g, '');
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
-    headings.push({ id, text, level });
+    let finalSlug = baseSlug;
+    if (slugCounts[baseSlug] !== undefined) {
+      slugCounts[baseSlug]++;
+      finalSlug = `${baseSlug}-${slugCounts[baseSlug]}`;
+    } else {
+      slugCounts[baseSlug] = 0;
+    }
+
+    headings.push({ level, text, id: finalSlug });
   }
-
   return headings;
 }

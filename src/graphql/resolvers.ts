@@ -1,5 +1,6 @@
 import { Resolvers } from '@/generated/graphql-resolvers';
 import { prisma } from '@/lib/prisma';
+import { calculateReadingTime } from '@/lib/utils';
 
 export const resolvers: Resolvers = {
   Query: {
@@ -21,10 +22,9 @@ export const resolvers: Resolvers = {
       return await prisma.post.findMany({
         include: {
           author: true,
-          comments: true,
           likes: true,
         },
-        orderBy: { createdAt: 'desc' }, // 최신순 정렬 추가
+        orderBy: { createdAt: 'desc' },
       });
     },
     post: async (_parent, { id }) => {
@@ -32,7 +32,6 @@ export const resolvers: Resolvers = {
         where: { id },
         include: {
           author: true,
-          comments: true,
           likes: true,
         },
       });
@@ -47,6 +46,8 @@ export const resolvers: Resolvers = {
 
       const { title, thumbnail, content, tags } = input;
 
+      const readingTime = calculateReadingTime(content);
+
       return await prisma.post.create({
         data: {
           title,
@@ -54,10 +55,10 @@ export const resolvers: Resolvers = {
           content,
           tags: tags || [],
           authorId: context.session.user.id,
+          readingTime,
         },
         include: {
           author: true,
-          comments: true,
           likes: true,
         },
       });

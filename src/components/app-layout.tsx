@@ -21,10 +21,8 @@ export function AppLayout({ className, children, aside }: ContentLayoutProps) {
           {children}
         </article>
 
-        {/* 사이드바 영역: aside가 있을 때만 렌더링 */}
         {aside && (
           <aside className='hidden w-full lg:block lg:max-w-[270px] lg:flex-shrink-0 lg:pl-12'>
-            {/* 사이드바도 본문과 높이를 맞추기 위해 pb-20을 적용하는 것이 깔끔합니다. */}
             <div className='sticky top-24 pt-12 pb-20'>{aside}</div>
           </aside>
         )}

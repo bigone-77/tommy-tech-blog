@@ -6,6 +6,14 @@ datasource db {
   provider = "postgresql"
 }
 
+model SiteVisit {
+  id        String   @id @default(uuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String  @map("user_id")
@@ -67,19 +75,22 @@ model Post {
   tags      String[]
   published Boolean   @default(false)
   viewCount Int       @default(0)
+  readingTime Int       @default(0)
+  viewLogs  ViewLog[]
   author    User      @relation(fields: [authorId], references: [id])
   authorId  String
-  comments  Comment[]
   likes     Like[]
   createdAt DateTime  @default(now())
 }
 
-model Comment {
-  id        String    @id @default(dbgenerated("gen_random_uuid()"))
-  content   String
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
+model ViewLog {
+  id        String   @id @default(uuid())
+  ip        String
   postId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([ip, postId])
 }
 
 model Like {

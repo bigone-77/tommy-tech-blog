@@ -15,11 +15,11 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 type Documents = {
     "\n  query GetPostById($id: ID!) {\n    post(id: $id) {\n      id\n      title\n      content\n      createdAt\n      author {\n        username\n      }\n    }\n  }\n": typeof types.GetPostByIdDocument,
-    "\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      author {\n        username\n      }\n    }\n  }\n": typeof types.GetPostsDocument,
+    "\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      viewCount\n      author {\n        username\n      }\n    }\n  }\n": typeof types.GetPostsDocument,
 };
 const documents: Documents = {
     "\n  query GetPostById($id: ID!) {\n    post(id: $id) {\n      id\n      title\n      content\n      createdAt\n      author {\n        username\n      }\n    }\n  }\n": types.GetPostByIdDocument,
-    "\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      author {\n        username\n      }\n    }\n  }\n": types.GetPostsDocument,
+    "\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      viewCount\n      author {\n        username\n      }\n    }\n  }\n": types.GetPostsDocument,
 };
 
 /**
@@ -43,7 +43,7 @@ export function graphql(source: "\n  query GetPostById($id: ID!) {\n    post(id:
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      author {\n        username\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      author {\n        username\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      viewCount\n      author {\n        username\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetPosts {\n    allPosts {\n      id\n      title\n      content\n      thumbnail\n      tags\n      createdAt\n      viewCount\n      author {\n        username\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

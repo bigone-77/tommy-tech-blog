@@ -9,6 +9,7 @@ export const GET_POSTS = graphql(`
       thumbnail
       tags
       createdAt
+      viewCount
       author {
         username
       }

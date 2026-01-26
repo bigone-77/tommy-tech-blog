@@ -6,7 +6,6 @@ import {
   BookText,
   Code2,
   GraduationCap,
-  PlusIcon,
   Sparkles,
 } from 'lucide-react';
 
@@ -14,8 +13,6 @@ import { AppLayout } from '@/components/app-layout';
 import { PostCard } from '@/components/post-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-// ✅ 설치 권장
-
 import { H2Typography } from '@/components/ui/typography';
 import { getClient } from '@/lib/apollo-client';
 import { cn, getFormattedDate } from '@/lib/utils';
@@ -53,32 +50,19 @@ export default async function HomePage() {
             정답으로 남도록.
           </p>
 
-          <div className='flex flex-wrap gap-4'>
-            <Button
-              size='lg'
-              asChild
-              className='shadow-primary/20 rounded-full px-8 shadow-lg transition-all hover:-translate-y-1'
-            >
-              <Link href='/about-me'>소개 더보기</Link>
-            </Button>
-
-            <Button
-              size='lg'
-              variant='outline'
-              asChild
-              className='hover:bg-accent rounded-full px-8 transition-all'
-            >
-              <Link href='/blog/write' className='gap-2'>
-                <PlusIcon className='h-4 w-4' /> 새 글 작성
-              </Link>
-            </Button>
-          </div>
+          <Button
+            size='lg'
+            asChild
+            className='shadow-primary/20 rounded-full px-8 shadow-lg transition-all hover:-translate-y-1'
+          >
+            <Link href='/about-me'>소개 더보기</Link>
+          </Button>
         </section>
 
         <Separator className='my-10' />
 
         <section className='space-y-10'>
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center justify-between border-b pb-4'>
             <div className='flex items-center gap-2'>
               <BookText className='text-primary h-5 w-5' />
 
@@ -99,26 +83,38 @@ export default async function HomePage() {
             className={cn(
               'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
               'gap-6 md:gap-8 lg:gap-12',
-              'mt-12',
-              recentPosts.length < 4 ? 'border-b pb-12' : '',
+              // 'mt-12',
+              // recentPosts.length < 4 ? 'border-b pb-12' : '',
             )}
           >
-            {recentPosts.map((post: any) => (
-              <PostCard
-                key={post.id}
-                url={`/blog/${post.id}`}
-                title={post.title}
-                date={getFormattedDate(
-                  new Date(post.createdAt),
-                  'M월 d일, yyyy년',
-                )}
-                thumbnail={post.thumbnail || ''}
-              />
-            ))}
+            {recentPosts.map((post: any) => {
+              const excerpt =
+                post.content
+                  ?.replace(/!\[.*?\]\(.*?\)/g, '')
+                  ?.replace(/[#*`>_~-]/g, '')
+                  ?.replace(/\[(.*?)\]\(.*?\)/g, '$1')
+                  .trim()
+                  .slice(0, 130) + '...';
+
+              return (
+                <PostCard
+                  key={post.id}
+                  id={post.id}
+                  url={`/blog/${post.id}`}
+                  title={post.title}
+                  thumbnail={post.thumbnail || ''}
+                  viewCount={post.viewCount}
+                  tags={post.tags}
+                  excerpt={excerpt}
+                  date={getFormattedDate(
+                    new Date(Number(post.createdAt)),
+                    'M월 d일, yyyy년',
+                  )}
+                />
+              );
+            })}
           </div>
         </section>
-
-        {/* 3. TIL & Projects: 2열 그리드 배치로 정보 밀도 최적화 */}
 
         <div className='grid grid-cols-1 gap-16 md:grid-cols-2'>
           <section className='space-y-8'>
@@ -159,8 +155,6 @@ export default async function HomePage() {
               ))}
             </div>
           </section>
-
-          {/* 프로젝트 섹션 */}
 
           <section className='space-y-8'>
             <div className='flex items-center justify-between border-b pb-4'>

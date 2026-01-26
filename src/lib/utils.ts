@@ -21,3 +21,15 @@ export const getFormattedDate = (
 
   return format(dateObj, formatStr, { locale: ko });
 };
+
+export const calculateReadingTime = (content: string): number => {
+  const WORDS_PER_MINUTE = 200;
+
+  const words = content.trim().split(/\s+/).length;
+
+  const minutes = words / WORDS_PER_MINUTE;
+
+  const roundedTime = Math.ceil(minutes / 5) * 5;
+
+  return Math.max(5, roundedTime);
+};

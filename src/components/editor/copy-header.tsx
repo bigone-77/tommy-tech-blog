@@ -12,14 +12,6 @@ interface CopyHeaderProps extends React.HTMLAttributes<HTMLHeadingElement> {
   id?: string;
 }
 
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .trim();
-}
-
 export function CopyHeader({
   level,
   children,
@@ -27,18 +19,19 @@ export function CopyHeader({
   id,
   ...props
 }: CopyHeaderProps) {
-  const safeId =
-    id || (typeof children === 'string' ? generateSlug(children) : '');
+  const safeId = id;
 
   const HeadingTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
   const copyToClipboard = async () => {
+    if (!safeId) return;
+
     const url = `${window.location.origin}${window.location.pathname}#${safeId}`;
     window.history.pushState({}, '', `#${safeId}`);
 
     const element = document.getElementById(safeId);
     if (element) {
-      const offset = 80;
+      const offset = 100;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -51,7 +44,7 @@ export function CopyHeader({
     try {
       await navigator.clipboard.writeText(url);
     } catch (err) {
-      console.error(err);
+      console.error('URL 복사 실패:', err);
     }
   };
 
@@ -61,15 +54,13 @@ export function CopyHeader({
     <HeadingTag
       id={safeId}
       className={cn(
-        'scroll-mt-20',
+        'scroll-mt-24',
         showCopyFunctionality &&
           'group hover:text-muted-foreground relative flex cursor-pointer items-center gap-2 transition-colors duration-200',
         className,
       )}
       onClick={showCopyFunctionality ? copyToClipboard : undefined}
-      title={
-        showCopyFunctionality ? 'Click to copy link to this section' : undefined
-      }
+      title={showCopyFunctionality ? '섹션 링크 복사하기' : undefined}
       {...props}
     >
       {children}

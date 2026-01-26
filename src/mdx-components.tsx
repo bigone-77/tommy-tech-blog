@@ -31,7 +31,6 @@ const createHeading = (level: number) => {
       </CopyHeader>
     );
   };
-
   Heading.displayName = `Heading${level}`;
   return Heading;
 };
@@ -41,11 +40,19 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     ...defaultMdxComponents,
     ...TabsComponents,
     img: (props) => <ImageZoom {...(props as any)} />,
-    pre: ({ ref: _ref, ...props }) => (
-      <CodeBlock {...props}>
-        <Pre>{props.children}</Pre>
-      </CodeBlock>
-    ),
+
+    pre: ({ children, ...props }: any) => {
+      const language = props['data-language'];
+
+      const displayTitle = props['data-title'] || language?.toUpperCase();
+
+      return (
+        <CodeBlock allowCopy keepBackground title={displayTitle} {...props}>
+          <Pre {...props}>{children}</Pre>
+        </CodeBlock>
+      );
+    },
+
     MediaViewer,
     ImageViewer,
     VideoViewer,
@@ -53,12 +60,14 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
+
     h1: createHeading(1),
     h2: createHeading(2),
     h3: createHeading(3),
     h4: createHeading(4),
     h5: createHeading(5),
     h6: createHeading(6),
+
     ...components,
   };
 }

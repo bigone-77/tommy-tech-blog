@@ -19,15 +19,6 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export type Comment = {
-  __typename?: 'Comment';
-  content: Scalars['String']['output'];
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  post: Post;
-  postId: Scalars['String']['output'];
-};
-
 export type CreatePostInput = {
   content: Scalars['String']['input'];
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -57,12 +48,12 @@ export type Post = {
   __typename?: 'Post';
   author: User;
   authorId: Scalars['String']['output'];
-  comments: Array<Comment>;
   content: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   likes: Array<Like>;
   published: Scalars['Boolean']['output'];
+  readingTime: Scalars['Int']['output'];
   tags: Array<Scalars['String']['output']>;
   thumbnail?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
@@ -83,14 +74,12 @@ export type QueryPostArgs = {
 
 export type User = {
   __typename?: 'User';
-  createdAt: Scalars['String']['output'];
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
   isAdmin?: Maybe<Scalars['Boolean']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   posts: Array<Post>;
-  updatedAt: Scalars['String']['output'];
   username: Scalars['String']['output'];
 };
 
@@ -168,7 +157,6 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  Comment: ResolverTypeWrapper<Omit<Comment, 'post'> & { post: ResolversTypes['Post'] }>;
   CreatePostInput: CreatePostInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
@@ -183,7 +171,6 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
-  Comment: Omit<Comment, 'post'> & { post: ResolversParentTypes['Post'] };
   CreatePostInput: CreatePostInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
@@ -193,14 +180,6 @@ export type ResolversParentTypes = {
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
   User: PrismaUser;
-};
-
-export type CommentResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
-  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
-  postId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type LikeResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Like'] = ResolversParentTypes['Like']> = {
@@ -217,12 +196,12 @@ export type MutationResolvers<ContextType = ContextValue, ParentType extends Res
 export type PostResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
   author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType>;
   content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   likes?: Resolver<Array<ResolversTypes['Like']>, ParentType, ContextType>;
   published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  readingTime?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   thumbnail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -236,19 +215,16 @@ export type QueryResolvers<ContextType = ContextValue, ParentType extends Resolv
 };
 
 export type UserResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   isAdmin?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
-  updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = ContextValue> = {
-  Comment?: CommentResolvers<ContextType>;
   Like?: LikeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
