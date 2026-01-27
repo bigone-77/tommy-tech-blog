@@ -10,6 +10,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 
 import { AppLayout } from '@/components/app-layout';
+import { EditDeleteBtn } from '@/components/post/post-edit-delete-btn';
 import { ReadProgressBar } from '@/components/read-progressbar';
 import { TableOfContents } from '@/components/table-of-contents';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,7 @@ import { extractHeadings } from '@/lib/toc';
 import { getFormattedDate } from '@/lib/utils';
 import { getMDXComponents } from '@/mdx-components';
 
-import { EditDeleteBtn } from '../../blog/[id]/_components/edit-delete-btn';
+import { deleteTil } from './page.actions';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -48,7 +49,7 @@ export default async function Page({ params }: Props) {
         hasToc ? (
           <div className='border-border bg-card rounded-xl border p-5 shadow-sm'>
             <p className='text-muted-foreground/50 mb-3 text-[11px] font-bold tracking-widest uppercase'>
-              학습 목차
+              목차
             </p>
             <TableOfContents headings={headings} />
           </div>
@@ -70,7 +71,14 @@ export default async function Page({ params }: Props) {
               <span className='text-sm font-medium'>기록 목록</span>
             </Link>
           </Button>
-          {isAdmin && <EditDeleteBtn id={id} />}
+          {isAdmin && (
+            <EditDeleteBtn
+              id={id}
+              basePath='til'
+              deleteAction={deleteTil}
+              confirmMessage='이 학습 기록을 지울까요?'
+            />
+          )}
         </div>
 
         <div className='space-y-4'>

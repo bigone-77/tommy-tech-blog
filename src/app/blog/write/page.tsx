@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <AppLayout>
       <PostEditorContainer
-        mode='post'
+        mode='blog'
         action={createPostAction}
         submitLabel='게시하기'
       />

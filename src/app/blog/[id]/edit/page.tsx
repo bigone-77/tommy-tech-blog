@@ -21,7 +21,7 @@ export default async function Page({
   return (
     <AppLayout>
       <PostEditorContainer
-        mode='post'
+        mode='blog'
         initialData={{
           title: post.title,
           content: post.content,

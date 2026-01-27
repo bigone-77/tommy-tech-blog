@@ -2,13 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { Heading } from '@/lib/toc';
 import { cn } from '@/lib/utils';
-
-export interface Heading {
-  id: string;
-  text: string;
-  level: number;
-}
 
 interface TableOfContentsProps {
   headings: Heading[];
@@ -17,7 +12,6 @@ interface TableOfContentsProps {
 
 export function TableOfContents({ headings, className }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
-
   const visibleHeadings = useRef<Map<string, boolean>>(new Map());
 
   useEffect(() => {
@@ -38,7 +32,7 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
         }
       },
       {
-        rootMargin: '-85px 0% -80% 0%',
+        rootMargin: '-100px 0% -80% 0%',
         threshold: 0,
       },
     );
@@ -51,20 +45,19 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
     return () => observer.disconnect();
   }, [headings]);
 
-  // TableOfContents.tsx 내부 handleClick 함수
+  const handleClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
 
-  const handleClick = (id: string) => {
     const element = document.getElementById(id);
 
     if (!element) {
-      console.warn(`ID를 찾을 수 없습니다: ${id}`); // 🚀 디버깅용 로그
+      console.warn(`ID를 찾을 수 없습니다: ${id}`);
       return;
     }
 
-    // 🚀 window.pageYOffset을 사용하는 것이 더 정확합니다.
-    const offset = 100; // 헤더 높이에 맞춰 조정하세요.
+    const offset = 100;
     const elementPosition =
-      element.getBoundingClientRect().top + window.pageYOffset;
+      element.getBoundingClientRect().top + window.scrollY;
     const offsetPosition = elementPosition - offset;
 
     window.scrollTo({
@@ -72,7 +65,7 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
       behavior: 'smooth',
     });
 
-    window.history.pushState({}, '', `#${id}`);
+    window.history.pushState(null, '', `#${id}`);
   };
 
   if (headings.length === 0) return null;
@@ -83,13 +76,13 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
         {headings.map((heading) => (
           <li key={heading.id}>
             <button
-              onClick={() => handleClick(heading.id)}
+              onClick={(e) => handleClick(e, heading.id)}
               style={{
                 paddingLeft: `${(heading.level - 1) * 0.75 + 1}rem`,
               }}
               className={cn(
                 'hover:text-foreground block w-full border-l-2 border-transparent py-1 text-left transition-all duration-200',
-                'text-[13px] leading-tight wrap-break-word whitespace-normal',
+                'text-[13px] leading-tight break-words whitespace-normal',
                 activeId === heading.id
                   ? 'border-primary text-primary bg-primary/5 font-medium'
                   : 'text-muted-foreground/60 hover:border-border/60',

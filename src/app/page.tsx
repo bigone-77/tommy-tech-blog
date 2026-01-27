@@ -14,17 +14,26 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { H2Typography } from '@/components/ui/typography';
 import { getClient } from '@/lib/apollo-client';
-import { cn, getFormattedDate } from '@/lib/utils';
+import { getFormattedDate } from '@/lib/utils';
 
 import { GET_POSTS } from './blog/page.queries';
+import { TilCard } from './til/_components/til-card';
+import { GET_DAILY_TILS } from './til/page.queries';
 
 export default async function HomePage() {
-  const { data } = await getClient().query({
-    query: GET_POSTS,
-    context: { fetchOptions: { cache: 'no-store' } },
-  });
+  const [blogRes, tilsRes] = await Promise.all([
+    getClient().query({
+      query: GET_POSTS,
+      context: { fetchOptions: { cache: 'no-store' } },
+    }),
+    getClient().query({
+      query: GET_DAILY_TILS,
+      context: { fetchOptions: { cache: 'no-store' } },
+    }),
+  ]);
 
-  const recentPosts = data?.allPosts?.slice(0, 3) || [];
+  const recentBlogs = blogRes.data?.allPosts?.slice(0, 3) || [];
+  const recentTils = tilsRes.data?.allTils?.slice(0, 3) || [];
 
   return (
     <AppLayout>
@@ -55,7 +64,7 @@ export default async function HomePage() {
           </Button>
         </section>
 
-        {/* 2. 최근 블로그 포스트 섹션 */}
+        {/* 2. 최근 블로그 포스트 섹션 (3컬럼 그리드) */}
         <section className='space-y-10'>
           <div className='flex items-center justify-between border-b pb-5'>
             <div className='flex items-center gap-2'>
@@ -72,12 +81,8 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div
-            className={cn(
-              'grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 lg:grid-cols-3',
-            )}
-          >
-            {recentPosts.map((post: any) => {
+          <div className='grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 lg:grid-cols-3'>
+            {recentBlogs.map((post: any) => {
               const excerpt =
                 post.content
                   ?.replace(/[#*`>_~-]/g, '')
@@ -105,7 +110,6 @@ export default async function HomePage() {
 
         {/* 3. TIL & Projects 그리드 섹션 */}
         <section className='grid grid-cols-1 gap-16 md:grid-cols-2'>
-          {/* TIL 영역 */}
           <div className='space-y-10'>
             <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
@@ -122,23 +126,19 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className='grid gap-4'>
-              {[
-                { id: 1, date: '2026. 01. 12', title: '컨테이너 쿼리 정복' },
-                { id: 2, date: '2026. 01. 10', title: 'Next.js 15 서버 액션' },
-              ].map((til) => (
-                <Link
+            <div className='border-border/40 ml-4 space-y-12 border-l-2 py-2 pl-10'>
+              {recentTils.map((til: any) => (
+                <TilCard
                   key={til.id}
-                  href={`/til/${til.id}`}
-                  className='group hover:bg-accent/50 block rounded-xl border p-5 transition-all'
-                >
-                  <h4 className='group-hover:text-primary text-sm font-bold transition-colors'>
-                    {til.title}
-                  </h4>
-                  <p className='text-muted-foreground mt-1 font-mono text-xs'>
-                    {til.date}
-                  </p>
-                </Link>
+                  id={til.id}
+                  title={til.title}
+                  tags={til.tags}
+                  content={til.content}
+                  date={getFormattedDate(
+                    new Date(Number(til.createdAt)),
+                    'yyyy. MM. dd',
+                  )}
+                />
               ))}
             </div>
           </div>

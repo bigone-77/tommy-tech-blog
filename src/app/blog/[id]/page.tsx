@@ -10,6 +10,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 
 import { AppLayout } from '@/components/app-layout';
+import { EditDeleteBtn } from '@/components/post/post-edit-delete-btn';
 import { ReadMoreSection } from '@/components/read-more-section';
 import { ReadProgressBar } from '@/components/read-progressbar';
 import { TableOfContents } from '@/components/table-of-contents';
@@ -22,9 +23,9 @@ import { extractHeadings } from '@/lib/toc';
 import { getFormattedDate } from '@/lib/utils';
 import { getMDXComponents } from '@/mdx-components';
 
-import { EditDeleteBtn } from './_components/edit-delete-btn';
 import { GiscusComments } from './_components/giscus-comments';
 import { ViewCounter } from './_components/view-counter';
+import { deletePost } from './page.actions';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -74,7 +75,9 @@ export default async function Page({ params }: Props) {
               <span className='text-sm font-medium'>목록으로</span>
             </Link>
           </Button>
-          {isAdmin && <EditDeleteBtn id={id} />}
+          {isAdmin && (
+            <EditDeleteBtn id={id} basePath='blog' deleteAction={deletePost} />
+          )}
         </div>
 
         <div className='space-y-4'>

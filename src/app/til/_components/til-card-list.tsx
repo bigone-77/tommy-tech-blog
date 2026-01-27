@@ -7,17 +7,14 @@ import { GET_DAILY_TILS } from '../page.queries';
 import { TilCard } from './til-card';
 
 export async function TilCardList({ selectedDate }: { selectedDate: Date }) {
+  const from = startOfDay(selectedDate);
+  const to = endOfDay(selectedDate);
+
   const { data } = await getClient().query({
     query: GET_DAILY_TILS,
     variables: {
-      fromDate: getFormattedDate(
-        startOfDay(selectedDate),
-        "yyyy-MM-dd'T'HH:mm:ss'Z'",
-      ),
-      toDate: getFormattedDate(
-        endOfDay(selectedDate),
-        "yyyy-MM-dd'T'HH:mm:ss'Z'",
-      ),
+      fromDate: from.toISOString(),
+      toDate: to.toISOString(),
     },
     context: { fetchOptions: { cache: 'no-store' } },
   });
@@ -25,7 +22,7 @@ export async function TilCardList({ selectedDate }: { selectedDate: Date }) {
   const tils = data?.allTils ?? [];
 
   return (
-    <div className='border-muted relative ml-4 space-y-12 border-l-2 pl-8'>
+    <div className='border-border/40 relative ml-4 space-y-16 border-l-2 py-4 pl-10'>
       {tils.length > 0 ? (
         tils.map((til: any) => (
           <TilCard
@@ -33,6 +30,7 @@ export async function TilCardList({ selectedDate }: { selectedDate: Date }) {
             id={til.id}
             title={til.title}
             tags={til.tags}
+            content={til.content}
             date={getFormattedDate(
               new Date(Number(til.createdAt)),
               'yyyy. MM. dd',
@@ -40,8 +38,9 @@ export async function TilCardList({ selectedDate }: { selectedDate: Date }) {
           />
         ))
       ) : (
-        <div className='text-muted-foreground py-20 text-center italic'>
-          기록이 없습니다. 🍃
+        <div className='text-muted-foreground/50 py-32 text-center'>
+          <p className='mb-4 text-4xl'>🍃</p>
+          <p className='font-medium italic'>이날의 기록은 아직 비어있습니다.</p>
         </div>
       )}
     </div>

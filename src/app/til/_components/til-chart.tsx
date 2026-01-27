@@ -1,41 +1,38 @@
-'use client';
-
-import { useMemo } from 'react';
-
-import { useSuspenseQuery } from '@apollo/client/react';
 import { format, isSameDay, subDays } from 'date-fns';
 
+import { getClient } from '@/lib/apollo-client';
 import { cn, getFormattedDate } from '@/lib/utils';
 
 import { GET_TIL_SUMMARY } from '../page.queries';
 
-export function TilChart() {
-  const { data } = useSuspenseQuery(GET_TIL_SUMMARY, {
+export async function TilChart() {
+  const { data } = await getClient().query({
+    query: GET_TIL_SUMMARY,
     variables: {
       fromDate: getFormattedDate(subDays(new Date(), 6), 'yyyy-MM-dd'),
     },
-  }) as any;
+    fetchPolicy: 'no-cache',
+    context: { fetchOptions: { cache: 'no-store' } },
+  });
 
-  const tils = data?.allTils || [];
+  const tils = data?.allTils ?? [];
+  const last7Days = Array.from({ length: 7 }, (_, i) =>
+    subDays(new Date(), 6 - i),
+  );
 
-  const chartData = useMemo(() => {
-    const last7Days = Array.from({ length: 7 }, (_, i) =>
-      subDays(new Date(), 6 - i),
-    );
-    return last7Days.map((day) => {
-      const count = tils.filter((til: any) => {
-        const d = /^\d+$/.test(String(til.createdAt))
-          ? new Date(Number(til.createdAt))
-          : new Date(til.createdAt);
-        return isSameDay(d, day);
-      }).length;
-      return {
-        label: format(day, 'MM.dd'),
-        fullDate: format(day, 'yyyy-MM-dd'),
-        count,
-      };
-    });
-  }, [tils]);
+  const chartData = last7Days.map((day) => {
+    const count = tils.filter((til: any) => {
+      const d = /^\d+$/.test(String(til.createdAt))
+        ? new Date(Number(til.createdAt))
+        : new Date(til.createdAt);
+      return isSameDay(d, day);
+    }).length;
+    return {
+      label: format(day, 'MM.dd'),
+      fullDate: format(day, 'yyyy-MM-dd'),
+      count,
+    };
+  });
 
   return (
     <div className='bg-card border-border rounded-xl border p-6 shadow-sm'>

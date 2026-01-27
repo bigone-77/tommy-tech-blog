@@ -61,14 +61,14 @@ export function PostEditor({
         <Textarea
           {...register('title')}
           placeholder={
-            mode === 'post' ? '제목을 입력하세요' : '오늘의 학습 키워드'
+            mode === 'blog' ? '제목을 입력하세요' : '오늘의 학습 키워드'
           }
           rows={1}
           className='placeholder:text-muted-foreground/30 min-h-[1.4em] w-full resize-none border-none bg-transparent px-0 py-0 !text-4xl font-bold shadow-none focus-visible:ring-0'
         />
       </div>
 
-      {mode === 'post' ? (
+      {mode === 'blog' ? (
         <Controller
           control={control}
           name='tags'
@@ -77,23 +77,38 @@ export function PostEditor({
           )}
         />
       ) : (
-        <div className='flex flex-wrap gap-2'>
-          {Object.keys(TIL_TEMPLATES).map((tag) => (
-            <Button
-              key={tag}
-              type='button'
-              variant={watchedTags.includes(tag) ? 'default' : 'outline'}
-              onClick={() => handleTilTagClick(tag)}
-              className={cn(
-                'rounded-full transition-all duration-200',
-                watchedTags.includes(tag) &&
-                  'bg-primary text-primary-foreground ring-primary/20 shadow-md ring-2',
-              )}
-            >
-              {tag}
-            </Button>
-          ))}
-        </div>
+        <Controller
+          control={control}
+          name='tags'
+          render={({ field }) => (
+            <div className='flex flex-wrap gap-2'>
+              {Object.keys(TIL_TEMPLATES).map((tag) => {
+                const isSelected = field.value?.includes(tag);
+
+                return (
+                  <Button
+                    key={tag}
+                    type='button'
+                    variant={isSelected ? 'default' : 'outline'}
+                    onClick={() => {
+                      const nextValue = isSelected
+                        ? field.value.filter((t: string) => t !== tag) // 선택 해제
+                        : [...(field.value || []), tag]; // 추가
+                      field.onChange(nextValue);
+                    }}
+                    className={cn(
+                      'rounded-full transition-all duration-200',
+                      isSelected &&
+                        'bg-primary text-primary-foreground ring-primary/20 shadow-md ring-2',
+                    )}
+                  >
+                    {tag}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
+        />
       )}
 
       {/* 에디터 툴바 */}

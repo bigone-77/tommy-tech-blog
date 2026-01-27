@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 import { prisma } from '@/lib/prisma';
 
@@ -45,13 +44,10 @@ export async function incrementView(id: string) {
 
 export async function deletePost(id: string) {
   try {
-    await prisma.post.delete({
-      where: { id },
-    });
+    await prisma.post.delete({ where: { id } });
+    revalidatePath('/blog');
+    return { success: true };
   } catch (error) {
-    throw new Error('게시글 삭제에 실패했습니다.');
+    return { success: false, message: '게시글 삭제에 실패했습니다.' };
   }
-
-  revalidatePath('/blog');
-  redirect('/blog');
 }

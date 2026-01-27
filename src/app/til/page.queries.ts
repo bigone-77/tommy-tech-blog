@@ -14,6 +14,7 @@ export const GET_DAILY_TILS = graphql(`
     allTils(fromDate: $fromDate, toDate: $toDate) {
       id
       title
+      content
       tags
       createdAt
     }
