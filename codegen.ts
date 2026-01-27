@@ -10,6 +10,7 @@ const config: CodegenConfig = {
         mappers: {
           User: '@prisma/client#User as PrismaUser',
           Post: '@prisma/client#Post as PrismaPost',
+          Til: '@/lib/prisma#Til',
         },
         contextType: '@/app/api/graphql/route#ContextValue',
       },

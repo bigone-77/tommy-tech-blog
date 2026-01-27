@@ -33,3 +33,10 @@ export const calculateReadingTime = (content: string): number => {
 
   return Math.max(5, roundedTime);
 };
+
+export function parseTilDate(date: string | undefined): Date {
+  if (!date) return new Date();
+  const isNumeric = /^\d+$/.test(date);
+  const parsed = isNumeric ? new Date(Number(date)) : new Date(date);
+  return isNaN(parsed.getTime()) ? new Date() : parsed;
+}

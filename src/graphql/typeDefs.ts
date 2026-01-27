@@ -22,31 +22,29 @@ export const typeDefs = gql`
     author: User!
     authorId: String!
     tags: [String!]!
-    likes: [Like!]!
     createdAt: String!
   }
 
-  type Like {
+  type Til {
     id: ID!
-    ip: String!
-    post: Post!
-    postId: String!
-  }
-
-  input CreatePostInput {
     title: String!
-    thumbnail: String
     content: String!
-    tags: [String!]
+    tags: [String!]!
+    published: Boolean!
+    author: User!
+    authorId: String!
+    createdAt: String!
   }
 
   type Query {
     me: User
+
+    # --- Blog ---
     allPosts: [Post!]!
     post(id: ID!): Post
-  }
 
-  type Mutation {
-    createPost(input: CreatePostInput!): Post!
+    # --- TIL ---
+    allTils(fromDate: String, toDate: String): [Til!]!
+    til(id: ID!): Til
   }
 `;

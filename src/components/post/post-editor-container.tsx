@@ -7,18 +7,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Button } from '@/components/ui/button';
 import { useImageHandler } from '@/hooks/use-image-handler';
-import { PostInput, postSchema } from '@/schema/write';
+import { blogSchema } from '@/schema/blog';
+import { tilSchema } from '@/schema/til';
 
 import { PostEditor } from './post-editor';
 import { PostPreview } from './post-preview';
 
 interface PostEditorContainerProps {
-  initialData?: PostInput;
+  mode: 'blog' | 'til';
+  initialData?: any;
   action: (prevState: any, formData: FormData) => Promise<any>;
   submitLabel: string;
 }
 
 export function PostEditorContainer({
+  mode,
   initialData = { title: '', content: '', tags: [] },
   action,
   submitLabel,
@@ -26,20 +29,23 @@ export function PostEditorContainer({
   const [state, formAction, isPending] = useActionState(action, null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { register, control, setValue, handleSubmit } = useForm<PostInput>({
-    resolver: zodResolver(postSchema),
+  const currentSchema = mode === 'blog' ? blogSchema : tilSchema;
+
+  const { register, control, setValue, handleSubmit } = useForm({
+    resolver: zodResolver(currentSchema),
     defaultValues: initialData,
   });
 
   const watchedValues = useWatch({ control });
 
   const { handleImageUpload, isUploading } = useImageHandler({
+    mode,
     textareaRef,
     setValue,
     content: watchedValues.content || '',
   });
 
-  const onSubmit = (data: PostInput) => {
+  const onSubmit = (data: any) => {
     startTransition(() => {
       const formData = new FormData();
       formData.append('title', data.title);
@@ -52,8 +58,9 @@ export function PostEditorContainer({
   return (
     <div className='bg-card flex h-[calc(100vh-200px)] flex-col overflow-hidden rounded-xl border shadow-sm'>
       <div className='flex min-h-0 flex-1'>
-        <div className='bg-background w-full overflow-hidden border-r @[1024px]/post:w-1/2'>
+        <div className='bg-background w-full overflow-hidden border-r lg:w-1/2'>
           <PostEditor
+            mode={mode}
             register={register}
             control={control}
             setValue={setValue}
@@ -65,7 +72,7 @@ export function PostEditorContainer({
           />
         </div>
 
-        <div className='hidden w-1/2 overflow-hidden @[1024px]/post:block'>
+        <div className='hidden w-1/2 overflow-hidden lg:block'>
           <PostPreview
             title={watchedValues.title || ''}
             content={watchedValues.content || ''}
@@ -93,7 +100,7 @@ export function PostEditorContainer({
             {isPending
               ? `${submitLabel} 중...`
               : isUploading
-                ? '이미지 전송 중...'
+                ? '업로드 중...'
                 : submitLabel}
           </Button>
         </div>

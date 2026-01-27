@@ -40,9 +40,9 @@ export default async function Page({
         />
       </div>
 
-      <header className='relative z-10 space-y-4 border-b pb-12'>
+      <div className='relative z-10 space-y-4 border-b pb-12'>
         <div className='space-y-4'>
-          <div className='flex items-center justify-between'>
+          <div className='flex flex-col gap-y-4 md:flex-row md:items-center md:justify-between md:gap-y-0'>
             <div className='flex items-center gap-x-2'>
               <BookText
                 size={48}
@@ -83,7 +83,7 @@ export default async function Page({
         >
           <BlogContent selectedTag={selectedTag} />
         </Suspense>
-      </header>
+      </div>
     </AppLayout>
   );
 }

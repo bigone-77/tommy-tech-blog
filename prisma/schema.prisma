@@ -46,14 +46,15 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
-  username      String?   @unique // 사용자님이 추가하신 필드
+  username      String?   @unique 
   name          String?
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
   accounts      Account[]
   sessions      Session[]
-  posts         Post[]    // 블로그 포스트 관계
+  posts         Post[]    
+  tils          Til[]
 
   @@map("users")
 }
@@ -79,8 +80,20 @@ model Post {
   viewLogs  ViewLog[]
   author    User      @relation(fields: [authorId], references: [id])
   authorId  String
-  likes     Like[]
   createdAt DateTime  @default(now())
+}
+
+model Til {
+  id          String    @id @default(dbgenerated("gen_random_uuid()"))
+  title       String
+  content     String    @db.Text
+  tags        String[]
+  published   Boolean   @default(true)
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@index([createdAt]) 
 }
 
 model ViewLog {
@@ -91,11 +104,4 @@ model ViewLog {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([ip, postId])
-}
-
-model Like {
-  id        String    @id @default(dbgenerated("gen_random_uuid()"))
-  ip     String
-  post   Post   @relation(fields: [postId], references: [id])
-  postId String
 }

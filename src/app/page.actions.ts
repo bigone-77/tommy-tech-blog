@@ -1,5 +1,12 @@
 'use server';
 
+import { serialize } from 'next-mdx-remote/serialize';
+
+import { remarkGfm } from 'fumadocs-core/mdx-plugins';
+import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
+
 import { prisma } from '@/lib/prisma';
 
 export async function trackSiteVisit(ip: string) {
@@ -27,4 +34,42 @@ export async function trackSiteVisit(ip: string) {
 
 export async function getTotalVisitors() {
   return await prisma.siteVisit.count();
+}
+
+export async function compileMDXAction(content: string) {
+  if (!content) return null;
+
+  try {
+    const mdxSource = await serialize(content, {
+      mdxOptions: {
+        format: 'md',
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [
+          rehypeRaw,
+          [
+            rehypePrettyCode,
+            {
+              theme: {
+                dark: 'one-dark-pro',
+                light: 'github-light',
+              },
+              keepBackground: true,
+              showLineNumbers: true,
+              onVisitLine(node: any) {
+                if (node.children.length === 0) {
+                  node.children = [{ type: 'text', value: ' ' }];
+                }
+              },
+            },
+          ],
+          rehypeSlug,
+        ],
+      },
+    });
+
+    return JSON.parse(JSON.stringify(mdxSource));
+  } catch (error) {
+    console.error('MDX 컴파일 에러:', error);
+    return null;
+  }
 }

@@ -1,15 +1,15 @@
 import { AppLayout } from '@/components/app-layout';
 import { PostEditorContainer } from '@/components/post/post-editor-container';
 
-import { createPostAction } from './page.actions';
+import { createTilAction } from './page.actions';
 
 export default function Page() {
   return (
     <AppLayout>
       <PostEditorContainer
-        mode='post'
-        action={createPostAction}
-        submitLabel='게시하기'
+        mode='til'
+        action={createTilAction}
+        submitLabel='기록하기'
       />
     </AppLayout>
   );

@@ -5,10 +5,13 @@ import { Controller, useWatch } from 'react-hook-form';
 
 import { EditorToolbar } from '@/components/editor/editor-toolbar';
 import { TagInput } from '@/components/editor/tag-input';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { TIL_TEMPLATES } from '@/constants/til-templates';
 import { cn } from '@/lib/utils';
 
 export function PostEditor({
+  mode,
   register,
   control,
   setValue,
@@ -17,7 +20,32 @@ export function PostEditor({
   isUploading,
 }: any) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   const titleValue = useWatch({ control, name: 'title', defaultValue: '' });
+  const watchedTags = useWatch({ control, name: 'tags', defaultValue: [] });
+  const contentValue = useWatch({ control, name: 'content', defaultValue: '' });
+
+  const handleTilTagClick = (tag: string) => {
+    const newTemplate = TIL_TEMPLATES[tag];
+
+    if (
+      contentValue.trim().length > 0 &&
+      contentValue !== TIL_TEMPLATES[watchedTags[0]]
+    ) {
+      if (
+        !confirm(
+          '태그를 변경하면 작성 중인 내용이 템플릿으로 대체됩니다. 변경할까요?',
+        )
+      ) {
+        return;
+      }
+    }
+
+    setValue('tags', [tag]);
+
+    setValue('content', newTemplate);
+    setTimeout(() => textareaRef.current?.focus(), 0);
+  };
 
   return (
     <div className='bg-background relative flex h-full flex-col space-y-6 overflow-y-auto p-10'>
@@ -32,20 +60,43 @@ export function PostEditor({
       >
         <Textarea
           {...register('title')}
-          placeholder='제목을 입력하세요'
+          placeholder={
+            mode === 'post' ? '제목을 입력하세요' : '오늘의 학습 키워드'
+          }
           rows={1}
-          className='placeholder:text-muted-foreground/30 min-h-[1.4em] w-full resize-none overflow-hidden border-none bg-transparent px-0 py-0 !text-4xl leading-[1.4] font-bold tracking-tight shadow-none focus-visible:ring-0'
+          className='placeholder:text-muted-foreground/30 min-h-[1.4em] w-full resize-none border-none bg-transparent px-0 py-0 !text-4xl font-bold shadow-none focus-visible:ring-0'
         />
       </div>
 
-      <Controller
-        control={control}
-        name='tags'
-        render={({ field }) => (
-          <TagInput value={field.value} onChange={field.onChange} />
-        )}
-      />
+      {mode === 'post' ? (
+        <Controller
+          control={control}
+          name='tags'
+          render={({ field }) => (
+            <TagInput value={field.value} onChange={field.onChange} />
+          )}
+        />
+      ) : (
+        <div className='flex flex-wrap gap-2'>
+          {Object.keys(TIL_TEMPLATES).map((tag) => (
+            <Button
+              key={tag}
+              type='button'
+              variant={watchedTags.includes(tag) ? 'default' : 'outline'}
+              onClick={() => handleTilTagClick(tag)}
+              className={cn(
+                'rounded-full transition-all duration-200',
+                watchedTags.includes(tag) &&
+                  'bg-primary text-primary-foreground ring-primary/20 shadow-md ring-2',
+              )}
+            >
+              {tag}
+            </Button>
+          ))}
+        </div>
+      )}
 
+      {/* 에디터 툴바 */}
       <EditorToolbar
         textareaRef={textareaRef}
         onContentChange={(val) => setValue('content', val)}
@@ -53,6 +104,7 @@ export function PostEditor({
         onImageClick={() => fileInputRef.current?.click()}
       />
 
+      {/* 본문 입력 영역 */}
       <div className='flex-1'>
         <input
           type='file'
@@ -76,7 +128,7 @@ export function PostEditor({
           placeholder={
             isUploading
               ? '이미지 업로드 중...'
-              : '당신의 이야기를 적어보세요...'
+              : '오늘 배운 내용을 기록해 보세요...'
           }
           className='min-h-[500px] w-full resize-none border-none px-0 text-lg leading-relaxed shadow-none focus-visible:ring-0'
         />

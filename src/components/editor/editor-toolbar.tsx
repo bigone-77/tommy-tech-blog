@@ -103,7 +103,7 @@ export function EditorToolbar({
           'mx-[-40px] !mt-0 mb-6 flex flex-wrap items-center gap-0.5 border-b px-[40px] pt-[40px] pb-3',
           isSticky
             ? 'border-b-primary/30 bg-background/95 py-4 shadow-lg backdrop-blur-sm'
-            : 'border-b-transparent shadow-none',
+            : 'border-b-border/50 shadow-none',
         )}
       >
         <ToolbarButton action='h1' icon={Heading1} label='제목 1' />

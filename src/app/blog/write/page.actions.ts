@@ -3,28 +3,12 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { v2 as cloudinary } from 'cloudinary';
 import crypto from 'crypto';
 
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { calculateReadingTime } from '@/lib/utils';
-import { postSchema } from '@/schema/write';
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-export async function getCloudinarySignature() {
-  const timestamp = Math.round(new Date().getTime() / 1000);
-  const signature = cloudinary.utils.api_sign_request(
-    { timestamp },
-    process.env.CLOUDINARY_API_SECRET!,
-  );
-  return { signature, timestamp };
-}
+import { blogSchema } from '@/schema/blog';
 
 export async function createPostAction(_: any, formData: FormData) {
   const session = await auth();
@@ -35,7 +19,7 @@ export async function createPostAction(_: any, formData: FormData) {
   const parsedTags = rawTags ? JSON.parse(rawTags) : [];
   const content = formData.get('content') as string;
 
-  const validated = postSchema.safeParse({
+  const validated = blogSchema.safeParse({
     title: formData.get('title'),
     content: content,
     tags: parsedTags,

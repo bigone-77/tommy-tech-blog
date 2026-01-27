@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { AppLayout } from '@/components/app-layout';
 import { prisma } from '@/lib/prisma';
 
-import { PostEditorContainer } from '../../_components/post-editor-container';
+import { PostEditorContainer } from '../../../../components/post/post-editor-container';
 import { updatePostAction } from './page.actions';
 
 export default async function Page({
@@ -21,6 +21,7 @@ export default async function Page({
   return (
     <AppLayout>
       <PostEditorContainer
+        mode='post'
         initialData={{
           title: post.title,
           content: post.content,

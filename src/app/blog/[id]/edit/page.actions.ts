@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { postSchema } from '@/schema/write';
+import { blogSchema } from '@/schema/blog';
 
 export async function updatePostAction(id: string, _: any, formData: FormData) {
   const session = await auth();
@@ -17,7 +17,7 @@ export async function updatePostAction(id: string, _: any, formData: FormData) {
   const parsedTags = rawTags ? JSON.parse(rawTags) : [];
   const content = formData.get('content') as string;
 
-  const validated = postSchema.safeParse({
+  const validated = blogSchema.safeParse({
     title: formData.get('title'),
     content: content,
     tags: parsedTags,

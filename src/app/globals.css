@@ -65,8 +65,11 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+
+  /* 🚀 추천: Deep Forest Emerald */
+  --primary: oklch(0.38 0.12 160);
   --primary-foreground: oklch(0.985 0 0);
+
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -99,8 +102,11 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+
+  /* 🚀 추천: Electric Mint */
+  --primary: oklch(0.82 0.14 160);
+  --primary-foreground: oklch(0.145 0 0);
+
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -135,62 +141,46 @@
   }
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
+/* 이하Pretty Code 및 View Transition 설정 동일 */
 [data-rehype-pretty-code-figure] span {
   color: var(--shiki-light);
 }
-
 .dark [data-rehype-pretty-code-figure] span {
   color: var(--shiki-dark);
 }
-
 [data-rehype-pretty-code-figure] pre {
   background-color: var(--shiki-light-bg) !important;
 }
-
 .dark [data-rehype-pretty-code-figure] pre {
   background-color: var(--shiki-dark-bg) !important;
 }
 
 [data-rehype-pretty-code-figure] pre {
   @apply border-border overflow-x-auto rounded-xl;
-  padding-left: 0 !important; /* 내부 line 패딩으로 조절 위해 0 설정 */
+  padding-left: 0 !important;
 }
-
 [data-rehype-pretty-code-figure] code {
-  counter-reset: line; /* 속성 유무 상관없이 카운터 시작 */
+  counter-reset: line;
   display: grid !important;
   min-width: 100%;
 }
-
-/* 3. 줄 번호 표시 (data-line이 있는 모든 요소 대상) */
 [data-line] {
   @apply relative px-4;
 }
-
 [data-line]::before {
   counter-increment: line;
   content: counter(line);
-
-  /* 숫자 디자인 및 고정 폭 확보 */
   display: inline-block;
   width: 1rem;
   margin-right: 1.5rem;
   text-align: right;
   color: var(--color-muted-foreground);
   opacity: 0.3;
-  user-select: none; /* 드래그 시 번호 제외 */
+  user-select: none;
 }
-
 [data-line].highlighted {
   @apply bg-accent/50 border-l-primary border-l-2;
 }
-
 [data-rehype-pretty-code-figure] {
   @apply relative;
 }

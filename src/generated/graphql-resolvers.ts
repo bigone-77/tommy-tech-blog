@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { User as PrismaUser, Post as PrismaPost } from '@prisma/client';
+import { Til } from '@/lib/prisma';
 import { ContextValue } from '@/app/api/graphql/route';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -8,7 +9,6 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -19,31 +19,6 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export type CreatePostInput = {
-  content: Scalars['String']['input'];
-  tags?: InputMaybe<Array<Scalars['String']['input']>>;
-  thumbnail?: InputMaybe<Scalars['String']['input']>;
-  title: Scalars['String']['input'];
-};
-
-export type Like = {
-  __typename?: 'Like';
-  id: Scalars['ID']['output'];
-  ip: Scalars['String']['output'];
-  post: Post;
-  postId: Scalars['String']['output'];
-};
-
-export type Mutation = {
-  __typename?: 'Mutation';
-  createPost: Post;
-};
-
-
-export type MutationCreatePostArgs = {
-  input: CreatePostInput;
-};
-
 export type Post = {
   __typename?: 'Post';
   author: User;
@@ -51,7 +26,6 @@ export type Post = {
   content: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  likes: Array<Like>;
   published: Scalars['Boolean']['output'];
   readingTime: Scalars['Int']['output'];
   tags: Array<Scalars['String']['output']>;
@@ -63,13 +37,38 @@ export type Post = {
 export type Query = {
   __typename?: 'Query';
   allPosts: Array<Post>;
+  allTils: Array<Til>;
   me?: Maybe<User>;
   post?: Maybe<Post>;
+  til?: Maybe<Til>;
+};
+
+
+export type QueryAllTilsArgs = {
+  fromDate?: InputMaybe<Scalars['String']['input']>;
+  toDate?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryPostArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryTilArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type Til = {
+  __typename?: 'Til';
+  author: User;
+  authorId: Scalars['String']['output'];
+  content: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  published: Scalars['Boolean']['output'];
+  tags: Array<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
 };
 
 export type User = {
@@ -157,40 +156,25 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  CreatePostInput: CreatePostInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  Like: ResolverTypeWrapper<Omit<Like, 'post'> & { post: ResolversTypes['Post'] }>;
-  Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Post: ResolverTypeWrapper<PrismaPost>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Til: ResolverTypeWrapper<Til>;
   User: ResolverTypeWrapper<PrismaUser>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
-  CreatePostInput: CreatePostInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
-  Like: Omit<Like, 'post'> & { post: ResolversParentTypes['Post'] };
-  Mutation: Record<PropertyKey, never>;
   Post: PrismaPost;
   Query: Record<PropertyKey, never>;
   String: Scalars['String']['output'];
+  Til: Til;
   User: PrismaUser;
-};
-
-export type LikeResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Like'] = ResolversParentTypes['Like']> = {
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  ip?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
-  postId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-};
-
-export type MutationResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'input'>>;
 };
 
 export type PostResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
@@ -199,7 +183,6 @@ export type PostResolvers<ContextType = ContextValue, ParentType extends Resolve
   content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  likes?: Resolver<Array<ResolversTypes['Like']>, ParentType, ContextType>;
   published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   readingTime?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
@@ -210,8 +193,21 @@ export type PostResolvers<ContextType = ContextValue, ParentType extends Resolve
 
 export type QueryResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   allPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  allTils?: Resolver<Array<ResolversTypes['Til']>, ParentType, ContextType, Partial<QueryAllTilsArgs>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryPostArgs, 'id'>>;
+  til?: Resolver<Maybe<ResolversTypes['Til']>, ParentType, ContextType, RequireFields<QueryTilArgs, 'id'>>;
+};
+
+export type TilResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Til'] = ResolversParentTypes['Til']> = {
+  author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -225,10 +221,9 @@ export type UserResolvers<ContextType = ContextValue, ParentType extends Resolve
 };
 
 export type Resolvers<ContextType = ContextValue> = {
-  Like?: LikeResolvers<ContextType>;
-  Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Til?: TilResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

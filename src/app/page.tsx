@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { Separator } from '@radix-ui/react-separator';
 import {
   ArrowRightIcon,
   BookText,
@@ -22,7 +21,6 @@ import { GET_POSTS } from './blog/page.queries';
 export default async function HomePage() {
   const { data } = await getClient().query({
     query: GET_POSTS,
-
     context: { fetchOptions: { cache: 'no-store' } },
   });
 
@@ -30,8 +28,9 @@ export default async function HomePage() {
 
   return (
     <AppLayout>
-      <div className='flex flex-col gap-y-10'>
-        <section className='relative space-y-8'>
+      <div className='flex flex-col gap-y-24 py-12'>
+        {/* 1. 히어로 섹션 */}
+        <section className='space-y-8'>
           <div className='space-y-4'>
             <Badge
               variant='secondary'
@@ -39,17 +38,14 @@ export default async function HomePage() {
             >
               <Sparkles className='mr-2 h-3 w-3' /> Junior Frontend developer
             </Badge>
-
             <h1 className='text-left text-4xl leading-[1.2] font-black tracking-tight lg:text-6xl'>
               ✋ Hello, Tommy
             </h1>
           </div>
-
-          <p className='text-muted-foreground text-lg leading-relaxed md:text-xl'>
+          <p className='text-muted-foreground max-w-[700px] text-lg leading-relaxed md:text-xl'>
             과거의 내가 내린 최선의 선택이, 시간이 흐른 뒤에도 여전히 기분 좋은
             정답으로 남도록.
           </p>
-
           <Button
             size='lg'
             asChild
@@ -59,18 +55,15 @@ export default async function HomePage() {
           </Button>
         </section>
 
-        <Separator className='my-10' />
-
+        {/* 2. 최근 블로그 포스트 섹션 */}
         <section className='space-y-10'>
-          <div className='flex items-center justify-between border-b pb-4'>
+          <div className='flex items-center justify-between border-b pb-5'>
             <div className='flex items-center gap-2'>
               <BookText className='text-primary h-5 w-5' />
-
-              <H2Typography className='border-none pb-0 text-2xl font-bold'>
+              <H2Typography className='border-none pb-0 text-xl font-bold'>
                 최근 블로그 포스트
               </H2Typography>
             </div>
-
             <Link
               href='/blog'
               className='text-muted-foreground hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors'
@@ -81,21 +74,15 @@ export default async function HomePage() {
 
           <div
             className={cn(
-              'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-              'gap-6 md:gap-8 lg:gap-12',
-              // 'mt-12',
-              // recentPosts.length < 4 ? 'border-b pb-12' : '',
+              'grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 lg:grid-cols-3',
             )}
           >
             {recentPosts.map((post: any) => {
               const excerpt =
                 post.content
-                  ?.replace(/!\[.*?\]\(.*?\)/g, '')
                   ?.replace(/[#*`>_~-]/g, '')
-                  ?.replace(/\[(.*?)\]\(.*?\)/g, '$1')
                   .trim()
-                  .slice(0, 130) + '...';
-
+                  .slice(0, 120) + '...';
               return (
                 <PostCard
                   key={post.id}
@@ -108,7 +95,7 @@ export default async function HomePage() {
                   excerpt={excerpt}
                   date={getFormattedDate(
                     new Date(Number(post.createdAt)),
-                    'M월 d일, yyyy년',
+                    'yyyy. MM. dd',
                   )}
                 />
               );
@@ -116,16 +103,17 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <div className='grid grid-cols-1 gap-16 md:grid-cols-2'>
-          <section className='space-y-8'>
-            <div className='flex items-center justify-between border-b pb-4'>
+        {/* 3. TIL & Projects 그리드 섹션 */}
+        <section className='grid grid-cols-1 gap-16 md:grid-cols-2'>
+          {/* TIL 영역 */}
+          <div className='space-y-10'>
+            <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
                 <GraduationCap className='text-primary h-5 w-5' />
                 <H2Typography className='border-none pb-0 text-xl font-bold'>
                   TIL
                 </H2Typography>
               </div>
-
               <Link
                 href='/til'
                 className='text-muted-foreground hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors'
@@ -142,30 +130,28 @@ export default async function HomePage() {
                 <Link
                   key={til.id}
                   href={`/til/${til.id}`}
-                  className='group hover:bg-accent/50 block cursor-pointer rounded-xl border p-4 transition-all'
+                  className='group hover:bg-accent/50 block rounded-xl border p-5 transition-all'
                 >
                   <h4 className='group-hover:text-primary text-sm font-bold transition-colors'>
                     {til.title}
                   </h4>
-
                   <p className='text-muted-foreground mt-1 font-mono text-xs'>
                     {til.date}
                   </p>
                 </Link>
               ))}
             </div>
-          </section>
+          </div>
 
-          <section className='space-y-8'>
-            <div className='flex items-center justify-between border-b pb-4'>
+          {/* Projects 영역 */}
+          <div className='space-y-10'>
+            <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
                 <Code2 className='text-primary h-5 w-5' />
-
                 <H2Typography className='border-none pb-0 text-xl font-bold'>
                   Projects
                 </H2Typography>
               </div>
-
               <Link
                 href='/projects'
                 className='text-muted-foreground hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors'
@@ -181,20 +167,19 @@ export default async function HomePage() {
               ].map((project) => (
                 <div
                   key={project.id}
-                  className='group hover:bg-accent/50 cursor-pointer rounded-xl border p-4 transition-all'
+                  className='group hover:bg-accent/50 cursor-pointer rounded-xl border p-5 transition-all'
                 >
                   <h4 className='group-hover:text-primary text-sm font-bold'>
                     {project.title}
                   </h4>
-
                   <p className='text-muted-foreground mt-1 text-xs'>
                     {project.desc}
                   </p>
                 </div>
               ))}
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
     </AppLayout>
   );
