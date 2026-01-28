@@ -36,15 +36,29 @@ export const typeDefs = gql`
     createdAt: String!
   }
 
+  type Project {
+    id: ID!
+    title: String!
+    description: String!
+    thumbnail: String!
+    techStack: [String!]!
+    techHighlights: [String!]!
+    period: String!
+    githubUrl: String
+    liveUrl: String
+    content: String!
+    isFeatured: Boolean!
+    published: Boolean!
+    createdAt: String!
+  }
+
   type Query {
     me: User
-
-    # --- Blog ---
     allPosts: [Post!]!
     post(id: ID!): Post
-
-    # --- TIL ---
     allTils(fromDate: String, toDate: String): [Til!]!
     til(id: ID!): Til
+    allProjects(isFeatured: Boolean): [Project!]!
+    project(id: ID!): Project
   }
 `;

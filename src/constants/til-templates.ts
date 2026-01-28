@@ -1,3 +1,10 @@
+export const TITLE_SUFFIXES: Record<string, string> = {
+  회고: '하루 요약 및 성찰',
+  개념정리: '핵심 개념 학습 정리',
+  트러블슈팅: '이슈 분석 및 해결',
+  알고리즘: '프로그래머스 문제풀이',
+};
+
 export const TIL_TEMPLATES: Record<string, string> = {
   회고: `## 📅 오늘의 요약
 > 오늘 하루를 한 문장으로 정의해 보세요.
@@ -56,5 +63,19 @@ export const TIL_TEMPLATES: Record<string, string> = {
 ### 💡 오늘의 교훈
 - 동일한 에러를 방지하기 위해 무엇을 기억해야 할까요?
 `,
-  알고리즘: '', // 🚀 여전히 비워둡니다.
+  알고리즘: `## 🧩 문제 설명
+- [문제 링크]()
+
+### 💡 풀이 과정 (Algorithm)
+1. 
+2. 
+
+### 💻 코드 (Code)
+\`\`\`typescript
+// 풀이 코드를 작성하세요.
+\`\`\`
+
+### 🏁 회고 (Retrospective)
+- 
+`,
 };

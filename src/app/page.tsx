@@ -4,7 +4,7 @@ import {
   ArrowRightIcon,
   BookText,
   Code2,
-  GraduationCap,
+  PenTool,
   Sparkles,
 } from 'lucide-react';
 
@@ -13,27 +13,40 @@ import { PostCard } from '@/components/post-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { H2Typography } from '@/components/ui/typography';
+import {
+  GetDailyTilsQuery,
+  GetPostsQuery,
+  GetProjectsQuery,
+} from '@/generated/gql/graphql';
 import { getClient } from '@/lib/apollo-client';
 import { getFormattedDate } from '@/lib/utils';
 
 import { GET_POSTS } from './blog/page.queries';
+import { ProjectCard } from './project/_components/project-card';
+import { GET_PROJECTS } from './project/page.queries';
 import { TilCard } from './til/_components/til-card';
 import { GET_DAILY_TILS } from './til/page.queries';
 
 export default async function HomePage() {
-  const [blogRes, tilsRes] = await Promise.all([
-    getClient().query({
+  const [blogRes, tilsRes, projectsRes] = await Promise.all([
+    getClient().query<GetPostsQuery>({
       query: GET_POSTS,
       context: { fetchOptions: { cache: 'no-store' } },
     }),
-    getClient().query({
+    getClient().query<GetDailyTilsQuery>({
       query: GET_DAILY_TILS,
+      context: { fetchOptions: { cache: 'no-store' } },
+    }),
+    getClient().query<GetProjectsQuery>({
+      query: GET_PROJECTS,
+      variables: { isFeatured: true },
       context: { fetchOptions: { cache: 'no-store' } },
     }),
   ]);
 
   const recentBlogs = blogRes.data?.allPosts?.slice(0, 3) || [];
   const recentTils = tilsRes.data?.allTils?.slice(0, 3) || [];
+  const featuredProjects = projectsRes.data?.allProjects?.slice(0, 3) || [];
 
   return (
     <AppLayout>
@@ -64,7 +77,7 @@ export default async function HomePage() {
           </Button>
         </section>
 
-        {/* 2. 최근 블로그 포스트 섹션 (3컬럼 그리드) */}
+        {/* 2. 최근 블로그 포스트 섹션 */}
         <section className='space-y-10'>
           <div className='flex items-center justify-between border-b pb-5'>
             <div className='flex items-center gap-2'>
@@ -82,7 +95,7 @@ export default async function HomePage() {
           </div>
 
           <div className='grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 lg:grid-cols-3'>
-            {recentBlogs.map((post: any) => {
+            {recentBlogs.map((post) => {
               const excerpt =
                 post.content
                   ?.replace(/[#*`>_~-]/g, '')
@@ -102,6 +115,7 @@ export default async function HomePage() {
                     new Date(Number(post.createdAt)),
                     'yyyy. MM. dd',
                   )}
+                  readingTime={post.readingTime}
                 />
               );
             })}
@@ -110,10 +124,11 @@ export default async function HomePage() {
 
         {/* 3. TIL & Projects 그리드 섹션 */}
         <section className='grid grid-cols-1 gap-16 md:grid-cols-2'>
+          {/* TIL 영역 */}
           <div className='space-y-10'>
             <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
-                <GraduationCap className='text-primary h-5 w-5' />
+                <PenTool className='text-primary h-5 w-5' />
                 <H2Typography className='border-none pb-0 text-xl font-bold'>
                   TIL
                 </H2Typography>
@@ -127,7 +142,7 @@ export default async function HomePage() {
             </div>
 
             <div className='border-border/40 ml-4 space-y-12 border-l-2 py-2 pl-10'>
-              {recentTils.map((til: any) => (
+              {recentTils.map((til) => (
                 <TilCard
                   key={til.id}
                   id={til.id}
@@ -143,39 +158,37 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Projects 영역 */}
+          {/* 🚀 Projects 영역 (실제 데이터 연동) */}
           <div className='space-y-10'>
             <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
                 <Code2 className='text-primary h-5 w-5' />
                 <H2Typography className='border-none pb-0 text-xl font-bold'>
-                  Projects
+                  Featured Projects
                 </H2Typography>
               </div>
               <Link
                 href='/projects'
                 className='text-muted-foreground hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors'
               >
-                전체 읽기 <ArrowRightIcon className='h-4 w-4' />
+                전체 보기 <ArrowRightIcon className='h-4 w-4' />
               </Link>
             </div>
 
             <div className='grid gap-4'>
-              {[
-                { id: 1, title: '디지털 가든', desc: '개인 블로그 테마' },
-                { id: 2, title: '알고리즘 도구', desc: '자동 포스팅 익스텐션' },
-              ].map((project) => (
-                <div
+              {featuredProjects.map((project) => (
+                <ProjectCard
                   key={project.id}
-                  className='group hover:bg-accent/50 cursor-pointer rounded-xl border p-5 transition-all'
-                >
-                  <h4 className='group-hover:text-primary text-sm font-bold'>
-                    {project.title}
-                  </h4>
-                  <p className='text-muted-foreground mt-1 text-xs'>
-                    {project.desc}
-                  </p>
-                </div>
+                  id={project.id}
+                  title={project.title}
+                  description={project.description}
+                  thumbnail={project.thumbnail}
+                  techHighlights={project.techHighlights}
+                  techStack={project.techStack}
+                  period={project.period}
+                  githubUrl={project.githubUrl}
+                  liveUrl={project.liveUrl}
+                />
               ))}
             </div>
           </div>

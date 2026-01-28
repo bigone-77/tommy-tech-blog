@@ -105,3 +105,19 @@ model ViewLog {
 
   @@index([ip, postId])
 }
+
+model Project {
+  id             String   @id @default(uuid())
+  title          String
+  description    String   @db.VarChar(200)    
+  thumbnail      String?                      
+  techStack      String[]                     
+  techHighlights String[]                     
+  period         String                       
+  githubUrl      String?
+  liveUrl        String?
+  content        String   @db.Text 
+  isFeatured     Boolean  @default(false)  
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+}

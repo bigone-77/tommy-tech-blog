@@ -35,7 +35,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 const navItems = [
   { href: '/blog', label: '블로그', icon: BookOpen },
   { href: '/til', label: '오늘 배운 것', icon: PenTool },
-  { href: '/projects', label: '프로젝트', icon: FolderCode },
+  { href: '/project', label: '프로젝트', icon: FolderCode },
   { href: '/about-me', label: '소개', icon: User },
 ];
 

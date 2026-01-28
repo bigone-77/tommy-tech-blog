@@ -14,17 +14,15 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  // 1. 수정할 TIL 데이터 조회
   const til = await prisma.til.findUnique({ where: { id } });
   if (!til) return notFound();
 
-  // 2. 서버 액션에 ID를 미리 바인딩
   const boundAction = updateTilAction.bind(null, id);
 
   return (
     <AppLayout>
       <PostEditorContainer
-        mode='til' // 🚀 모드를 'til'로 설정
+        mode='til'
         initialData={{
           title: til.title,
           content: til.content,

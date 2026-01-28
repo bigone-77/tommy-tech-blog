@@ -44,7 +44,7 @@ export function TilCard({
         </div>
 
         <Link href={`/til/${id}`} className='group/link block'>
-          <h3 className='group-hover/link:text-primary mb-2 text-2xl font-black tracking-tight transition-colors'>
+          <h3 className='group-hover/link:text-primary mb-2 text-lg font-black tracking-tight transition-colors'>
             {title}
           </h3>
 

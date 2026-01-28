@@ -11,13 +11,20 @@ const config: CodegenConfig = {
           User: '@prisma/client#User as PrismaUser',
           Post: '@prisma/client#Post as PrismaPost',
           Til: '@/lib/prisma#Til',
+          Project: '@/lib/prisma#Project',
         },
         contextType: '@/app/api/graphql/route#ContextValue',
+        maybeValue: 'T | null',
+        avoidOptionals: true,
       },
     },
     'src/generated/gql/': {
       preset: 'client',
       plugins: [],
+      config: {
+        maybeValue: 'T | null',
+        avoidOptionals: true,
+      },
     },
   },
 };

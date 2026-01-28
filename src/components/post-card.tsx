@@ -10,7 +10,7 @@ import { AppImage } from './app-image';
 
 interface Props extends Pick<
   Post,
-  'id' | 'title' | 'thumbnail' | 'viewCount' | 'tags'
+  'id' | 'title' | 'thumbnail' | 'viewCount' | 'tags' | 'readingTime'
 > {
   url: string;
   date: string;
@@ -25,6 +25,7 @@ export function PostCard({
   viewCount,
   tags,
   excerpt,
+  readingTime,
 }: Props) {
   return (
     <Link href={url} className='group block h-full'>
@@ -73,7 +74,7 @@ export function PostCard({
               </div>
               <div className='text-muted-foreground/50 flex items-center gap-1 font-mono text-[10px]'>
                 <Clock size={12} className='shrink-0' />
-                <span>5m</span>
+                <span>{readingTime || 5}m</span>
               </div>
             </div>
           </div>

@@ -84,12 +84,13 @@ export default async function Page({
             <TilChart />
           </Suspense>
 
-          <div className='grid grid-cols-1 gap-12 lg:grid-cols-[300px_1fr]'>
-            <aside className='hidden lg:block'>
+          <div className='flex flex-col gap-y-12 lg:grid lg:grid-cols-[300px_1fr] lg:gap-x-12 lg:gap-y-0'>
+            <aside className='w-full'>
               <Suspense fallback={<TilCalendarSkeleton />}>
                 <TilCalendar selectedDate={validDate} />
               </Suspense>
             </aside>
+
             <section className='space-y-10'>
               <Suspense fallback={<TilDailySkeleton />}>
                 <TilCardList selectedDate={validDate} />

@@ -7,8 +7,8 @@ import { EditorToolbar } from '@/components/editor/editor-toolbar';
 import { TagInput } from '@/components/editor/tag-input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { TIL_TEMPLATES } from '@/constants/til-templates';
-import { cn } from '@/lib/utils';
+import { TIL_TEMPLATES, TITLE_SUFFIXES } from '@/constants/til-templates';
+import { cn, getFormattedDate } from '@/lib/utils';
 
 export function PostEditor({
   mode,
@@ -25,30 +25,62 @@ export function PostEditor({
   const watchedTags = useWatch({ control, name: 'tags', defaultValue: [] });
   const contentValue = useWatch({ control, name: 'content', defaultValue: '' });
 
-  const handleTilTagClick = (tag: string) => {
+  const handleTilTagClick = (
+    tag: string,
+    fieldOnChange: (val: string[]) => void,
+  ) => {
     const newTemplate = TIL_TEMPLATES[tag];
+    const suffix = TITLE_SUFFIXES[tag] || '학습 기록';
+    const isSelected = watchedTags.includes(tag);
 
-    if (
+    if (isSelected) {
+      fieldOnChange(watchedTags.filter((t: string) => t !== tag));
+      return;
+    }
+
+    const isContentModified =
       contentValue.trim().length > 0 &&
-      contentValue !== TIL_TEMPLATES[watchedTags[0]]
-    ) {
-      if (
-        !confirm(
-          '태그를 변경하면 작성 중인 내용이 템플릿으로 대체됩니다. 변경할까요?',
-        )
-      ) {
+      !Object.values(TIL_TEMPLATES).some(
+        (template) => template.trim() === contentValue.trim(),
+      );
+
+    const isTitleModified =
+      titleValue.trim().length > 0 && !titleValue.startsWith('[');
+
+    if (isContentModified || isTitleModified) {
+      if (!confirm('태그를 변경하면 작성 중인 제목과 내용이 대체됩니다.')) {
         return;
       }
     }
 
-    setValue('tags', [tag]);
+    fieldOnChange([tag]);
 
-    setValue('content', newTemplate);
-    setTimeout(() => textareaRef.current?.focus(), 0);
+    const dateStr = getFormattedDate(new Date(), 'yyyy. MM. dd');
+    const autoTitle = `[${tag}] ${dateStr} | ${suffix}`;
+    setValue('title', autoTitle, { shouldDirty: true });
+
+    if (typeof newTemplate === 'string') {
+      setValue('content', newTemplate, {
+        shouldDirty: true,
+        shouldValidate: true,
+        shouldTouch: true,
+      });
+
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.setSelectionRange(
+            newTemplate.length,
+            newTemplate.length,
+          );
+        }
+      }, 50);
+    }
   };
 
   return (
     <div className='bg-background relative flex h-full flex-col space-y-6 overflow-y-auto p-10'>
+      {/* 제목 영역 */}
       <div
         className={cn(
           'grid text-4xl leading-[1.4] font-bold tracking-tight',
@@ -68,6 +100,7 @@ export function PostEditor({
         />
       </div>
 
+      {/* 태그 영역 */}
       {mode === 'blog' ? (
         <Controller
           control={control}
@@ -84,22 +117,16 @@ export function PostEditor({
             <div className='flex flex-wrap gap-2'>
               {Object.keys(TIL_TEMPLATES).map((tag) => {
                 const isSelected = field.value?.includes(tag);
-
                 return (
                   <Button
                     key={tag}
                     type='button'
                     variant={isSelected ? 'default' : 'outline'}
-                    onClick={() => {
-                      const nextValue = isSelected
-                        ? field.value.filter((t: string) => t !== tag) // 선택 해제
-                        : [...(field.value || []), tag]; // 추가
-                      field.onChange(nextValue);
-                    }}
+                    onClick={() => handleTilTagClick(tag, field.onChange)}
                     className={cn(
                       'rounded-full transition-all duration-200',
                       isSelected &&
-                        'bg-primary text-primary-foreground ring-primary/20 shadow-md ring-2',
+                        'bg-primary text-primary-foreground shadow-sm',
                     )}
                   >
                     {tag}
@@ -133,19 +160,26 @@ export function PostEditor({
             e.target.value = '';
           }}
         />
-        <Textarea
-          {...register('content')}
-          ref={(e) => {
-            register('content').ref(e);
-            textareaRef.current = e;
-          }}
-          disabled={isUploading}
-          placeholder={
-            isUploading
-              ? '이미지 업로드 중...'
-              : '오늘 배운 내용을 기록해 보세요...'
-          }
-          className='min-h-[500px] w-full resize-none border-none px-0 text-lg leading-relaxed shadow-none focus-visible:ring-0'
+        <Controller
+          control={control}
+          name='content'
+          render={({ field }) => (
+            <Textarea
+              {...field}
+              value={field.value || ''}
+              ref={(e) => {
+                field.ref(e);
+                textareaRef.current = e;
+              }}
+              disabled={isUploading}
+              placeholder={
+                isUploading
+                  ? '이미지 업로드 중...'
+                  : '오늘 배운 내용을 기록해 보세요...'
+              }
+              className='min-h-[500px] w-full resize-none border-none px-0 text-lg leading-relaxed shadow-none focus-visible:ring-0'
+            />
+          )}
         />
       </div>
     </div>

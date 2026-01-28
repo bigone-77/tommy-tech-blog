@@ -10,6 +10,7 @@ export const GET_POSTS = graphql(`
       tags
       createdAt
       viewCount
+      readingTime
       author {
         username
       }

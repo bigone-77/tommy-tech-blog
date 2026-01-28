@@ -56,5 +56,21 @@ export const resolvers: Resolvers = {
         include: { author: true },
       });
     },
+
+    allProjects: async (_parent, { isFeatured }) => {
+      return await prisma.project.findMany({
+        where: {
+          published: true,
+          ...(typeof isFeatured === 'boolean' ? { isFeatured } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    },
+
+    project: async (_parent, { id }) => {
+      return await prisma.project.findUnique({
+        where: { id },
+      });
+    },
   },
 };
