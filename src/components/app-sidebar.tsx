@@ -71,7 +71,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarSeparator />
 
-      {/* 2. Content: 메뉴 섹션 */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className='group-data-[collapsible=icon]:hidden'>
@@ -91,14 +90,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       tooltip={item.label}
                       isActive={isActive}
                       className={cn(
-                        'h-10 transition-all duration-200',
-                        isActive &&
-                          'bg-sidebar-accent text-sidebar-accent-foreground font-semibold',
+                        'h-10 transition-all duration-200 ease-in-out',
+                        isActive
+                          ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold'
+                          : 'hover:bg-sidebar-accent/50 text-sidebar-foreground/70',
                       )}
                     >
                       <Link href={item.href}>
                         <item.icon
-                          className={cn('size-4', isActive && 'text-primary')}
+                          className={cn(
+                            'size-4 transition-colors',
+                            isActive
+                              ? 'text-sidebar-accent-foreground'
+                              : 'text-muted-foreground',
+                          )}
                         />
                         <span className='group-data-[collapsible=icon]:hidden'>
                           {item.label}
@@ -113,7 +118,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* 3. Footer: 하단 연결 및 테마 토글 */}
       <SidebarFooter>
         <SidebarGroup>
           <SidebarGroupLabel className='group-data-[collapsible=icon]:hidden'>

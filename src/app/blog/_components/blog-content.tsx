@@ -67,6 +67,7 @@ export async function BlogContent({ selectedTag }: { selectedTag: string }) {
                 new Date(Number(post.createdAt)),
                 'M월 d일, yyyy년',
               )}
+              readingTime={post.readingTime}
             />
           );
         })}

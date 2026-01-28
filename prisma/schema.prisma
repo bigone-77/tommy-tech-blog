@@ -106,18 +106,25 @@ model ViewLog {
   @@index([ip, postId])
 }
 
+enum ProjectStatus {
+  DEVELOPING  // 개발중
+  LIVE        // 운영중
+  ARCHIVED    // 보관중 (운영 종료 혹은 링크 만료)
+}
+
 model Project {
-  id             String   @id @default(uuid())
+  id             String        @id @default(uuid())
   title          String
-  description    String   @db.VarChar(200)    
+  description    String        @db.VarChar(200)    
   thumbnail      String?                      
   techStack      String[]                     
   techHighlights String[]                     
   period         String                       
   githubUrl      String?
   liveUrl        String?
-  content        String   @db.Text 
-  isFeatured     Boolean  @default(false)  
-  published      Boolean  @default(true)
-  createdAt      DateTime @default(now())
+  content        String        @db.Text 
+  status         ProjectStatus @default(DEVELOPING) 
+  isFeatured     Boolean       @default(false)  
+  published      Boolean       @default(true)
+  createdAt      DateTime      @default(now())
 }

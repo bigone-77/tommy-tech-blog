@@ -36,6 +36,12 @@ export const typeDefs = gql`
     createdAt: String!
   }
 
+  enum ProjectStatus {
+    DEVELOPING
+    LIVE
+    ARCHIVED
+  }
+
   type Project {
     id: ID!
     title: String!
@@ -47,6 +53,7 @@ export const typeDefs = gql`
     githubUrl: String
     liveUrl: String
     content: String!
+    status: ProjectStatus!
     isFeatured: Boolean!
     published: Boolean!
     createdAt: String!
@@ -58,7 +65,11 @@ export const typeDefs = gql`
     post(id: ID!): Post
     allTils(fromDate: String, toDate: String): [Til!]!
     til(id: ID!): Til
-    allProjects(isFeatured: Boolean): [Project!]!
+    allProjects(
+      isFeatured: Boolean
+      status: ProjectStatus
+      take: Int
+    ): [Project!]!
     project(id: ID!): Project
   }
 `;

@@ -29,7 +29,7 @@ export type Post = {
   published: Scalars['Boolean']['output'];
   readingTime: Scalars['Int']['output'];
   tags: Array<Scalars['String']['output']>;
-  thumbnail: Maybe<Scalars['String']['output']>;
+  thumbnail?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
   viewCount: Scalars['Int']['output'];
 };
@@ -39,38 +39,47 @@ export type Project = {
   content: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
   description: Scalars['String']['output'];
-  githubUrl: Maybe<Scalars['String']['output']>;
+  githubUrl?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   isFeatured: Scalars['Boolean']['output'];
-  liveUrl: Maybe<Scalars['String']['output']>;
+  liveUrl?: Maybe<Scalars['String']['output']>;
   period: Scalars['String']['output'];
   published: Scalars['Boolean']['output'];
+  status: ProjectStatus;
   techHighlights: Array<Scalars['String']['output']>;
   techStack: Array<Scalars['String']['output']>;
   thumbnail: Scalars['String']['output'];
   title: Scalars['String']['output'];
 };
 
+export enum ProjectStatus {
+  Archived = 'ARCHIVED',
+  Developing = 'DEVELOPING',
+  Live = 'LIVE'
+}
+
 export type Query = {
   __typename?: 'Query';
   allPosts: Array<Post>;
   allProjects: Array<Project>;
   allTils: Array<Til>;
-  me: Maybe<User>;
-  post: Maybe<Post>;
-  project: Maybe<Project>;
-  til: Maybe<Til>;
+  me?: Maybe<User>;
+  post?: Maybe<Post>;
+  project?: Maybe<Project>;
+  til?: Maybe<Til>;
 };
 
 
 export type QueryAllProjectsArgs = {
-  isFeatured: InputMaybe<Scalars['Boolean']['input']>;
+  isFeatured?: InputMaybe<Scalars['Boolean']['input']>;
+  status?: InputMaybe<ProjectStatus>;
+  take?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryAllTilsArgs = {
-  fromDate: InputMaybe<Scalars['String']['input']>;
-  toDate: InputMaybe<Scalars['String']['input']>;
+  fromDate?: InputMaybe<Scalars['String']['input']>;
+  toDate?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -102,11 +111,11 @@ export type Til = {
 
 export type User = {
   __typename?: 'User';
-  email: Maybe<Scalars['String']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  image: Maybe<Scalars['String']['output']>;
-  isAdmin: Maybe<Scalars['Boolean']['output']>;
-  name: Maybe<Scalars['String']['output']>;
+  image?: Maybe<Scalars['String']['output']>;
+  isAdmin?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
   posts: Array<Post>;
   username: Scalars['String']['output'];
 };
@@ -189,6 +198,7 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Post: ResolverTypeWrapper<PrismaPost>;
   Project: ResolverTypeWrapper<Project>;
+  ProjectStatus: ProjectStatus;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Til: ResolverTypeWrapper<Til>;
@@ -209,71 +219,72 @@ export type ResolversParentTypes = {
 };
 
 export type PostResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
-  author: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  authorId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  content: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  published: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  readingTime: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  tags: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  thumbnail: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  title: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  viewCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  readingTime?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  thumbnail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  viewCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type ProjectResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
-  content: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  description: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  githubUrl: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  isFeatured: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  liveUrl: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  period: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  published: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  techHighlights: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  techStack: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  thumbnail: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  title: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  githubUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  isFeatured?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  liveUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  period?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['ProjectStatus'], ParentType, ContextType>;
+  techHighlights?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  techStack?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  thumbnail?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  allPosts: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
-  allProjects: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType, QueryAllProjectsArgs>;
-  allTils: Resolver<Array<ResolversTypes['Til']>, ParentType, ContextType, QueryAllTilsArgs>;
-  me: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  post: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryPostArgs, 'id'>>;
-  project: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectArgs, 'id'>>;
-  til: Resolver<Maybe<ResolversTypes['Til']>, ParentType, ContextType, RequireFields<QueryTilArgs, 'id'>>;
+  allPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  allProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType, Partial<QueryAllProjectsArgs>>;
+  allTils?: Resolver<Array<ResolversTypes['Til']>, ParentType, ContextType, Partial<QueryAllTilsArgs>>;
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryPostArgs, 'id'>>;
+  project?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectArgs, 'id'>>;
+  til?: Resolver<Maybe<ResolversTypes['Til']>, ParentType, ContextType, RequireFields<QueryTilArgs, 'id'>>;
 };
 
 export type TilResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['Til'] = ResolversParentTypes['Til']> = {
-  author: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  authorId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  content: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  published: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  tags: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  title: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  author?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  published?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = ContextValue, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  email: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  image: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  isAdmin: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  posts: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
-  username: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isAdmin?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = ContextValue> = {
-  Post: PostResolvers<ContextType>;
-  Project: ProjectResolvers<ContextType>;
-  Query: QueryResolvers<ContextType>;
-  Til: TilResolvers<ContextType>;
-  User: UserResolvers<ContextType>;
+  Post?: PostResolvers<ContextType>;
+  Project?: ProjectResolvers<ContextType>;
+  Query?: QueryResolvers<ContextType>;
+  Til?: TilResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 };
 

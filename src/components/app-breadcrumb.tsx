@@ -19,7 +19,7 @@ import {
 const ROUTE_MAP: Record<string, string> = {
   blog: '블로그',
   til: '오늘 배운 것',
-  projects: '프로젝트',
+  project: '프로젝트',
   'about-me': '소개',
 };
 

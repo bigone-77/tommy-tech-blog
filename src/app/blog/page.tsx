@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 
 import Link from 'next/link';
 
-import { BookText, PlusIcon } from 'lucide-react';
+import { BookOpen, PlusIcon } from 'lucide-react';
 
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,7 @@ export default async function Page({
         <div className='space-y-4'>
           <div className='flex flex-col gap-y-4 md:flex-row md:items-center md:justify-between md:gap-y-0'>
             <div className='flex items-center gap-x-2'>
-              <BookText
+              <BookOpen
                 size={48}
                 strokeWidth={2.5}
                 className='text-primary shrink-0'

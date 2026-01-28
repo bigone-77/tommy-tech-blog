@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 import {
   ArrowRightIcon,
-  BookText,
-  Code2,
+  BookOpen,
+  FolderCode,
   PenTool,
   Sparkles,
 } from 'lucide-react';
@@ -39,14 +39,19 @@ export default async function HomePage() {
     }),
     getClient().query<GetProjectsQuery>({
       query: GET_PROJECTS,
-      variables: { isFeatured: true },
+      variables: {
+        isFeatured: true,
+        take: 3,
+      },
       context: { fetchOptions: { cache: 'no-store' } },
     }),
   ]);
 
   const recentBlogs = blogRes.data?.allPosts?.slice(0, 3) || [];
   const recentTils = tilsRes.data?.allTils?.slice(0, 3) || [];
-  const featuredProjects = projectsRes.data?.allProjects?.slice(0, 3) || [];
+
+  // 🚀 서버에서 3개만 응답받으므로 더 이상 slice가 필요 없습니다.
+  const featuredProjects = projectsRes.data?.allProjects || [];
 
   return (
     <AppLayout>
@@ -81,9 +86,9 @@ export default async function HomePage() {
         <section className='space-y-10'>
           <div className='flex items-center justify-between border-b pb-5'>
             <div className='flex items-center gap-2'>
-              <BookText className='text-primary h-5 w-5' />
+              <BookOpen className='text-primary h-5 w-5' />
               <H2Typography className='border-none pb-0 text-xl font-bold'>
-                최근 블로그 포스트
+                블로그
               </H2Typography>
             </div>
             <Link
@@ -130,7 +135,7 @@ export default async function HomePage() {
               <div className='flex items-center gap-2'>
                 <PenTool className='text-primary h-5 w-5' />
                 <H2Typography className='border-none pb-0 text-xl font-bold'>
-                  TIL
+                  오늘 배운 것
                 </H2Typography>
               </div>
               <Link
@@ -158,37 +163,26 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* 🚀 Projects 영역 (실제 데이터 연동) */}
+          {/* 🚀 Projects 영역: Featured & 최신 3개만 렌더링 */}
           <div className='space-y-10'>
             <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
-                <Code2 className='text-primary h-5 w-5' />
+                <FolderCode className='text-primary h-5 w-5' />
                 <H2Typography className='border-none pb-0 text-xl font-bold'>
-                  Featured Projects
+                  프로젝트
                 </H2Typography>
               </div>
               <Link
-                href='/projects'
+                href='/project'
                 className='text-muted-foreground hover:text-primary flex items-center gap-1 text-sm font-medium transition-colors'
               >
-                전체 보기 <ArrowRightIcon className='h-4 w-4' />
+                전체 읽기 <ArrowRightIcon className='h-4 w-4' />
               </Link>
             </div>
 
             <div className='grid gap-4'>
               {featuredProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  id={project.id}
-                  title={project.title}
-                  description={project.description}
-                  thumbnail={project.thumbnail}
-                  techHighlights={project.techHighlights}
-                  techStack={project.techStack}
-                  period={project.period}
-                  githubUrl={project.githubUrl}
-                  liveUrl={project.liveUrl}
-                />
+                <ProjectCard key={project.id} {...project} isFeatured={false} />
               ))}
             </div>
           </div>

@@ -15,7 +15,7 @@ const config: CodegenConfig = {
         },
         contextType: '@/app/api/graphql/route#ContextValue',
         maybeValue: 'T | null',
-        avoidOptionals: true,
+        avoidOptionals: false,
       },
     },
     'src/generated/gql/': {

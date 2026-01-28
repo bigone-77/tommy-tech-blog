@@ -1,3 +1,5 @@
+import { ProjectStatus } from '@prisma/client';
+
 import { Resolvers } from '@/generated/graphql-resolvers';
 import { prisma } from '@/lib/prisma';
 
@@ -57,13 +59,17 @@ export const resolvers: Resolvers = {
       });
     },
 
-    allProjects: async (_parent, { isFeatured }) => {
+    allProjects: async (_parent, { isFeatured, status, take }) => {
       return await prisma.project.findMany({
         where: {
+          isFeatured: isFeatured ?? undefined,
+          status: (status as ProjectStatus) ?? undefined,
           published: true,
-          ...(typeof isFeatured === 'boolean' ? { isFeatured } : {}),
         },
-        orderBy: { createdAt: 'desc' },
+        take: take ?? undefined,
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
     },
 
