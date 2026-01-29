@@ -19,7 +19,6 @@ export default async function ProjectPage({
 
   return (
     <AppLayout>
-      {/* 배경 장식: 블로그와 동일한 설정 */}
       <div className='absolute top-0 left-0 z-0 h-50 w-full [mask-image:linear-gradient(to_top,transparent_25%,black_95%)]'>
         <FlickeringGrid
           className='absolute top-0 left-0 size-full'

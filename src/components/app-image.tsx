@@ -33,19 +33,17 @@ export function AppImage({
       )}
     >
       {showFallback ? (
-        /* 💡 썸네일이 없을 때: Magic UI Retro Grid 렌더링 */
         <div className='relative flex h-full w-full items-center justify-center'>
           <RetroGrid />
           <div className='z-10 flex flex-col items-center gap-2 opacity-20'>
             <div className='bg-foreground/50 h-px w-12' />
             <span className='text-[10px] font-black tracking-[0.2em] uppercase'>
-              Digital Garden
+              No Image
             </span>
             <div className='bg-foreground/50 h-px w-12' />
           </div>
         </div>
       ) : (
-        /* 💡 이미지가 있을 때: 기존 최적화 로직 유지 */
         <Image
           {...props}
           src={src}

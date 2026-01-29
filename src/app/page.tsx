@@ -50,11 +50,10 @@ export default async function HomePage() {
   const recentBlogs = blogRes.data?.allPosts?.slice(0, 3) || [];
   const recentTils = tilsRes.data?.allTils?.slice(0, 3) || [];
 
-  // 🚀 서버에서 3개만 응답받으므로 더 이상 slice가 필요 없습니다.
   const featuredProjects = projectsRes.data?.allProjects || [];
 
   return (
-    <AppLayout>
+    <AppLayout className='pt-0'>
       <div className='flex flex-col gap-y-24 py-12'>
         {/* 1. 히어로 섹션 */}
         <section className='space-y-8'>
@@ -82,7 +81,6 @@ export default async function HomePage() {
           </Button>
         </section>
 
-        {/* 2. 최근 블로그 포스트 섹션 */}
         <section className='space-y-10'>
           <div className='flex items-center justify-between border-b pb-5'>
             <div className='flex items-center gap-2'>
@@ -127,9 +125,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* 3. TIL & Projects 그리드 섹션 */}
         <section className='grid grid-cols-1 gap-16 md:grid-cols-2'>
-          {/* TIL 영역 */}
           <div className='space-y-10'>
             <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>
@@ -163,7 +159,6 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* 🚀 Projects 영역: Featured & 최신 3개만 렌더링 */}
           <div className='space-y-10'>
             <div className='flex items-center justify-between border-b pb-5'>
               <div className='flex items-center gap-2'>

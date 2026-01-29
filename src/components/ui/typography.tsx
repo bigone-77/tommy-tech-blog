@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface TypographyProps {
   className?: string;
-  children: string;
+  children: string | React.ReactNode;
 }
 
 interface ListProps {
