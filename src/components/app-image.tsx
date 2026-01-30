@@ -52,7 +52,7 @@ export function AppImage({
           unoptimized={!isOptimizedDomain}
           decoding='async'
           className={cn(
-            'object-cover duration-500 ease-in-out',
+            'object-contain duration-500 ease-in-out',
             'group-hover:scale-105',
           )}
           onError={() => setIsError(true)}

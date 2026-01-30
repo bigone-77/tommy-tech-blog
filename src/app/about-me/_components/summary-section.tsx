@@ -6,6 +6,8 @@ import { BlurFade } from '@/components/ui/blur-fade';
 import { Highlighter } from '@/components/ui/highlighter';
 import { H1Typography, PTypography } from '@/components/ui/typography';
 
+import { PrintableResume } from './printable-resume';
+
 export function SummarySection() {
   const PRIMARY_HEX = '#10b981';
 
@@ -85,6 +87,9 @@ export function SummarySection() {
               </span>
               과 사용자 경험의 깊이를 고민합니다.
             </PTypography>
+            <div className='flex justify-center md:justify-start'>
+              <PrintableResume />
+            </div>
           </div>
         </div>
       </BlurFade>
